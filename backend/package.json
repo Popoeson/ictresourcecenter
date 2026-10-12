@@ -9,7 +9,17 @@
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "express": "^4.19.2"
+    "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.0",
+    "pino": "^9.3.2",
+    "zod": "^3.23.8"
   }
 }
