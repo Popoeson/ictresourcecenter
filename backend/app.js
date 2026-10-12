@@ -12,14 +12,24 @@ const app = express();
 
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
-app.use(express.json());
+app.use(helmet());
+app.use(cors({ origin: env.frontendUrl, credentials: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(cookieParser());
+app.use(mongoSanitize());
+app.use('/api', apiLimiter);
 
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, data: { status: 'ok', time: new Date().toISOString() } });
+  const db = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  res.json({ success: true, data: { status: 'ok', db, time: new Date().toISOString() } });
 });
 
-app.use('/api', (req, res) => {
-  res.status(404).json({ success: false, message: 'Not found', code: 'NOT_FOUND' });
+// TEMPORARY: checks that rate limiting sees the real visitor IP. Remove in Phase 8.
+app.get('/api/_ip', (req, res) => {
+  res.json({ success: true, data: { ip: req.ip, forwardedFor: req.headers['x-forwarded-for'] || null } });
 });
+
+app.use('/api', notFound);
+app.use(errorHandler);
 
 module.exports = app;
