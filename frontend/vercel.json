@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://irc-lem6.onrender.com/api/$1" }
+  ]
+}
