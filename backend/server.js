@@ -1,7 +1,17 @@
 const app = require('./app');
+const { env, assertEnv } = require('./config/env');
+const { connectDb } = require('./config/db');
+const logger = require('./config/logger');
 
-const PORT = process.env.PORT || 3000;
+async function start() {
+  assertEnv();
+  await connectDb(env.mongodbUri);
+  app.listen(env.port, () => {
+    logger.info(`ICT API listening on port ${env.port}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`ICT API listening on port ${PORT}`);
+start().catch((err) => {
+  logger.error({ err: err.message }, 'Startup failed');
+  process.exit(1);
 });
