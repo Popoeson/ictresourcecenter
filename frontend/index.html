@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ICT Course Portal</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Arial, sans-serif; background: #F4F5F0; color: #1B1B1B; margin: 0; padding: 24px; }
+    .card { background: #fff; border-radius: 20px; max-width: 480px; margin: 40px auto; padding: 24px; }
+    #status { font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>ICT Course Portal</h1>
+    <p id="status">Checking the server...</p>
+  </div>
+  <script>
+    fetch('/api/health')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        document.getElementById('status').textContent =
+          d.success ? 'Server is connected.' : 'Server replied with an error.';
+      })
+      .catch(function () {
+        document.getElementById('status').textContent = 'Could not reach the server.';
+      });
+  </script>
+</body>
+</html>
