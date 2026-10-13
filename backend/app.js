@@ -13,7 +13,7 @@ const lookupRoutes = require('./routes/lookupRoutes');
 const priceRoutes = require('./routes/priceRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const importRoutes = require('./routes/importRoutes');
-const app = express();
+const adminRoutes = require('./routes/adminRoutes');
 
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
@@ -38,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin/prices', priceRoutes);
 app.use('/api/admin/students', studentRoutes);
 app.use('/api/admin/import', importRoutes);
+app.use('/api/admin/admins', adminRoutes);
 app.use('/api/admin', structureRoutes);
 app.use('/api/lookups', lookupRoutes);
 app.use('/api', notFound);
