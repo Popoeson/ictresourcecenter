@@ -19,7 +19,7 @@
     <p>Log in first on <a href="/admin/auth-test.html">auth-test.html</a>, then come back here.</p>
     <label>Method</label>
     <select id="method">
-      <option>GET</option><option>POST</option><option>PATCH</option><option>DELETE</option>
+            <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
     </select>
     <label>Path</label>
     <input id="path" value="/api/admin/institutions">
@@ -34,7 +34,8 @@
       var path = document.getElementById('path').value.trim();
       var out = document.getElementById('out');
       var opts = { method: method, headers: {} };
-      if (method === 'POST' || method === 'PATCH') {
+            if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+     
         opts.headers['Content-Type'] = 'application/json';
         opts.body = document.getElementById('body').value;
       }
