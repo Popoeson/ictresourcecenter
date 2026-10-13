@@ -15,6 +15,8 @@ const studentRoutes = require('./routes/studentRoutes');
 const importRoutes = require('./routes/importRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
+const app = express();
+
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
 app.use(helmet());
