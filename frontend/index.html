@@ -4,27 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ICT Course Portal</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Arial, sans-serif; background: #F4F5F0; color: #1B1B1B; margin: 0; padding: 24px; }
-    .card { background: #fff; border-radius: 20px; max-width: 480px; margin: 40px auto; padding: 24px; }
-    #status { font-size: 16px; }
-  </style>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+
 </head>
+
 <body>
-  <div class="card">
-    <h1>ICT Course Portal</h1>
-    <p id="status">Checking the server...</p>
-  </div>
+  <header class="site-header">
+    <a class="brand" href="/">ICT Course Portal</a>
+    <a class="header-link" href="/admin/login.html">Admin</a>
+  </header>
+
+  <main class="container container-wide">
+    <h1 class="page-title">Welcome</h1>
+    <p class="lead">What would you like to do today?</p>
+
+    <div class="home-cards">
+      <a class="action-card action-card-primary" href="/submit-assignment.html" data-soon>
+        <span class="action-title">Submit Assignment</span>
+        <span class="action-text">Pay per file, then upload with a token</span>
+      </a>
+      <a class="action-card" href="/pay-fee.html" data-soon>
+        <span class="action-title">Pay ICT Fee</span>
+        <span class="action-text">One-time course fee</span>
+      </a>
+      <a class="action-card" href="/buy-handout.html" data-soon>
+        <span class="action-title">Buy Handout</span>
+        <span class="action-text">Get the course handout as a PDF or a hard copy</span>
+      </a>
+    </div>
+
+    <p class="muted center">Not registered yet? Contact your course lecturer.</p>
+  </main>
+
+  <footer class="site-footer">
+    <p>Need help? Contact your course lecturer. &copy; <span id="year"></span></p>
+  </footer>
+
+  <script src="/js/ui.js"></script>
   <script>
-    fetch('/api/health')
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        document.getElementById('status').textContent =
-          d.success ? 'Server is connected.' : 'Server replied with an error.';
-      })
-      .catch(function () {
-        document.getElementById('status').textContent = 'Could not reach the server.';
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // These pages are built in later phases
+    document.querySelectorAll('[data-soon]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        UI.toast('This page is coming soon.', 'info');
       });
+    });
   </script>
 </body>
 </html>
