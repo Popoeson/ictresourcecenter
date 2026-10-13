@@ -2,6 +2,7 @@ const app = require('./app');
 const { env, assertEnv } = require('./config/env');
 const { connectDb } = require('./config/db');
 const logger = require('./config/logger');
+require('./models');
 
 async function start() {
   assertEnv();
