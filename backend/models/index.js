@@ -9,5 +9,11 @@ module.exports = {
   Setting: require('./Setting'),
   Counter: require('./Counter'),
   Payment: require('./Payment'),
-  Token: require('./Token'),
+    Token: require('./Token'),
+  Submission: require('./Submission'),
+  HandoutFile: require('./HandoutFile'),
+  HandoutOrder: require('./HandoutOrder'),
+  ImportBatch: require('./ImportBatch'),
+  AuditLog: require('./AuditLog'),
+  WebhookEvent: require('./WebhookEvent'),
 };
