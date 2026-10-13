@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const { env } = require('./config/env');
 const { apiLimiter } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/api/_ip', (req, res) => {
   res.json({ success: true, data: { ip: req.ip, forwardedFor: req.headers['x-forwarded-for'] || null } });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api', notFound);
 app.use(errorHandler);
 
