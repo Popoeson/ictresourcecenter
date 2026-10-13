@@ -4,5 +4,10 @@ module.exports = {
   Institution: require('./Institution'),
   Department: require('./Department'),
   Level: require('./Level'),
-  Price: require('./Price'),
+    Price: require('./Price'),
+  Student: require('./Student'),
+  Setting: require('./Setting'),
+  Counter: require('./Counter'),
+  Payment: require('./Payment'),
+  Token: require('./Token'),
 };
