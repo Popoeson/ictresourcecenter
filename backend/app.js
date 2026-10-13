@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const structureRoutes = require('./routes/structureRoutes');
 const lookupRoutes = require('./routes/lookupRoutes');
 const priceRoutes = require('./routes/priceRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.get('/api/_ip', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/prices', priceRoutes);
+app.use('/api/admin/students', studentRoutes);
 app.use('/api/admin', structureRoutes);
 app.use('/api/lookups', lookupRoutes);
 app.use('/api', notFound);
