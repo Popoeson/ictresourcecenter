@@ -10,7 +10,7 @@ const importBatchSchema = new mongoose.Schema(
       duplicates: { type: Number, default: 0 },
       rejected: { type: Number, default: 0 },
     },
-    errors: [
+        rowErrors: [
       {
         _id: false,
         rowNumber: { type: Number },
