@@ -23,7 +23,7 @@ const saveSchema = z
     handoutPrice: kobo,
   })
   .refine(
-        (d) => d.ictFee !== undefined || d.handoutPrice !== undefined,
+    (d) => d.ictFee !== undefined || d.handoutPrice !== undefined,
     'Nothing to update.'
   );
 
@@ -40,6 +40,6 @@ const assignmentSchema = z
   .refine((d) => d.assignmentPerFile !== undefined, 'Enter the price.');
 
 router.get('/assignment', validate(z.object({ institution: objectId.optional() }), 'query'), a.listAssignmentPrices);
-router.put('/assignment', requireRole('superadmin'), validate(assignmentSchema), a.saveAssignmentPrice););
+router.put('/assignment', requireRole('superadmin'), validate(assignmentSchema), a.saveAssignmentPrice);
 
 module.exports = router;
