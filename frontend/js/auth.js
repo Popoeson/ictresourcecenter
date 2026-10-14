@@ -19,7 +19,7 @@
         { key: 'prices', label: 'Prices', icon: 'tag', href: '/admin/prices.html', roles: SUPER, ready: true },
     { key: 'handout-settings', label: 'Handout settings', icon: 'sliders', href: '/admin/handout-settings.html', roles: SUPER, ready: false },
     { key: 'tokens', label: 'Tokens', icon: 'key', href: '/admin/tokens.html', roles: SUPER, ready: false },
-    { key: 'admins', label: 'Admins', icon: 'shield', href: '/admin/admins.html', roles: SUPER, ready: false },
+        { key: 'admins', label: 'Admins', icon: 'shield', href: '/admin/admins.html', roles: SUPER, ready: true },
     { key: 'audit', label: 'Audit log', icon: 'clipboard', href: '/admin/audit.html', roles: SUPER, ready: false },
     { key: 'password', label: 'Change password', icon: 'lock', href: '/admin/change-password.html', roles: BOTH, ready: true }
   ];
