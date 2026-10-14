@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Students | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading shell-heading-row">
+      <div>
+        <h1>Students</h1>
+        <p class="muted" id="page-sub">Everyone who offers the course.</p>
+      </div>
+      <button type="button" class="btn btn-primary hidden" id="add-student"></button>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-q">Search</label>
+        <input class="input" id="f-q" type="search" placeholder="Name, email or phone" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-inst">Institution</label>
+        <select class="select" id="f-inst"></select>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select class="select" id="f-dept" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-level">Level</label>
+        <select class="select" id="f-level" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-fee">ICT fee</label>
+        <select class="select" id="f-fee">
+          <option value="">All</option>
+          <option value="true">Paid</option>
+          <option value="false">Not paid</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="students-count" aria-live="polite"></p>
+
+    <div id="students-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="students-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Institution</th>
+            <th>Department</th>
+            <th>Level</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>ICT fee</th>
+            <th id="th-actions" hidden><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="students-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/students.js"></script>
+</body>
+</html>
