@@ -9,7 +9,7 @@
   // ready: false shows the item greyed with a "Soon" tag. Set it to true when the page is built.
   var MENU = [
     { key: 'dashboard', label: 'Overview', icon: 'grid', href: '/admin/dashboard.html', roles: BOTH, ready: true },
-    { key: 'students', label: 'Students', icon: 'users', href: '/admin/students.html', roles: BOTH, ready: false },
+        { key: 'students', label: 'Students', icon: 'users', href: '/admin/students.html', roles: BOTH, ready: true },
     { key: 'submissions', label: 'Submissions', icon: 'file', href: '/admin/submissions.html', roles: BOTH, ready: false },
     { key: 'payments', label: 'Payments', icon: 'card', href: '/admin/payments.html', roles: BOTH, ready: false },
     { key: 'handouts', label: 'Handout orders', icon: 'book', href: '/admin/handouts.html', roles: BOTH, ready: false },
