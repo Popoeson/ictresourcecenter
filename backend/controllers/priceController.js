@@ -3,7 +3,7 @@ const { AppError } = require('../middleware/errorHandler');
 const { normKey } = require('../services/normalize');
 const auditService = require('../services/auditService');
 
-const FIELDS = ['ictFee', 'assignmentPerFile', 'handoutPrice'];
+const FIELDS = ['ictFee', 'handoutPrice'];
 
 function send(res, data, status = 200) {
   res.status(status).json({ success: true, data });
@@ -32,7 +32,6 @@ async function listPrices(req, res, next) {
           levelKey: l.levelKey,
           levelLabel: l.name,
           ictFee: p ? p.ictFee : null,
-          assignmentPerFile: p ? p.assignmentPerFile : null,
           handoutPrice: p ? p.handoutPrice : null,
         });
       }
