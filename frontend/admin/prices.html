@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Prices | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Prices</h1>
+      <p class="muted">Amounts are in naira. Each row saves on its own.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Price type">
+      <button type="button" class="tab" role="tab" id="tab-ict" aria-selected="true" aria-controls="panel-ict">ICT fee and handout</button>
+      <button type="button" class="tab" role="tab" id="tab-assignment" aria-selected="false" aria-controls="panel-assignment">Assignment (per file)</button>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div id="panel-ict" role="tabpanel" aria-labelledby="tab-ict">
+      <p class="hint">ICT fee and handout price are set for each level name and apply to every department in the institution.</p>
+      <div id="ict-list"></div>
+    </div>
+
+    <div id="panel-assignment" role="tabpanel" aria-labelledby="tab-assignment" class="hidden">
+      <p class="hint">The assignment price per file is set for each department's level.</p>
+      <div id="assignment-list"></div>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/prices.js"></script>
+</body>
+</html>
