@@ -451,6 +451,19 @@ a { color: var(--text); }
 .price-body { margin-top: 8px; }
 .price-dept-group { margin-top: 4px; }
 
+/* ---------- Students page ---------- */
+.select:disabled, .input:disabled { background-color: var(--accent-soft); color: #8A8A8A; cursor: not-allowed; }
+.students-table .student-name { font-weight: 500; }
+.students-table td { overflow-wrap: anywhere; }
+.students-table .cell-actions { white-space: nowrap; }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.pager-info { font-size: 14px; color: var(--text-muted); text-align: center; }
+@media (max-width: 599px) {
+  .students-table.responsive td { text-align: right; }
+  .students-table.responsive td::before { text-align: left; }
+  .students-table.responsive .cell-actions { justify-content: flex-end; }
+}
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
