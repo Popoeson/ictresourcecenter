@@ -3,6 +3,7 @@ const { z } = require('zod');
 const { validate } = require('../middleware/validate');
 const { protect, requireRole } = require('../middleware/auth');
 const c = require('../controllers/priceController');
+const a = require('../controllers/assignmentPriceController');
 
 const router = express.Router();
 
@@ -19,7 +20,6 @@ const saveSchema = z
     institution: objectId,
     levelKey: z.string().trim().min(1).max(120),
     ictFee: kobo,
-    assignmentPerFile: kobo,
     handoutPrice: kobo,
   })
   .refine(
