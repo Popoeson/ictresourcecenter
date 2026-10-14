@@ -26,11 +26,63 @@
 
     <div id="panel-ict" role="tabpanel" aria-labelledby="tab-ict">
       <p class="hint">ICT fee and handout price are set for each level name and apply to every department in the institution.</p>
+      <div class="filter-bar">
+        <div class="field">
+          <label for="ict-q">Search</label>
+          <input class="input" id="ict-q" type="search" placeholder="Institution or level" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="ict-inst">Institution</label>
+          <select class="select" id="ict-inst"></select>
+        </div>
+        <div class="field">
+          <label for="ict-status">Price status</label>
+          <select class="select" id="ict-status">
+            <option value="all">All</option>
+            <option value="missing">Missing a price</option>
+            <option value="set">All prices set</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row filter-actions">
+        <button type="button" class="btn btn-secondary btn-small" id="ict-expand">Expand all</button>
+        <button type="button" class="btn btn-secondary btn-small" id="ict-collapse">Collapse all</button>
+        <button type="button" class="btn btn-secondary btn-small" id="ict-clear">Clear filters</button>
+      </div>
+      <p class="hint" id="ict-count" aria-live="polite"></p>
       <div id="ict-list"></div>
     </div>
 
     <div id="panel-assignment" role="tabpanel" aria-labelledby="tab-assignment" class="hidden">
       <p class="hint">The assignment price per file is set for each department's level.</p>
+      <div class="filter-bar">
+        <div class="field">
+          <label for="as-q">Search</label>
+          <input class="input" id="as-q" type="search" placeholder="Institution, department or level" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="as-inst">Institution</label>
+          <select class="select" id="as-inst"></select>
+        </div>
+        <div class="field">
+          <label for="as-dept">Department</label>
+          <select class="select" id="as-dept"></select>
+        </div>
+        <div class="field">
+          <label for="as-status">Price status</label>
+          <select class="select" id="as-status">
+            <option value="all">All</option>
+            <option value="missing">Missing a price</option>
+            <option value="set">All prices set</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row filter-actions">
+        <button type="button" class="btn btn-secondary btn-small" id="as-expand">Expand all</button>
+        <button type="button" class="btn btn-secondary btn-small" id="as-collapse">Collapse all</button>
+        <button type="button" class="btn btn-secondary btn-small" id="as-clear">Clear filters</button>
+      </div>
+      <p class="hint" id="as-count" aria-live="polite"></p>
       <div id="assignment-list"></div>
     </div>
   </div>
