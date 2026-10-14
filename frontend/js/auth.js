@@ -15,7 +15,7 @@
     { key: 'handouts', label: 'Handout orders', icon: 'book', href: '/admin/handouts.html', roles: BOTH, ready: false },
     { key: 'reports', label: 'Reports', icon: 'chart', href: '/admin/reports.html', roles: BOTH, ready: false },
     { key: 'import', label: 'Imports', icon: 'upload', href: '/admin/import.html', roles: SUPER, ready: false },
-    { key: 'structure', label: 'Structure', icon: 'layers', href: '/admin/structure.html', roles: SUPER, ready: false },
+        { key: 'structure', label: 'Structure', icon: 'layers', href: '/admin/structure.html', roles: SUPER, ready: true },
     { key: 'prices', label: 'Prices', icon: 'tag', href: '/admin/prices.html', roles: SUPER, ready: false },
     { key: 'handout-settings', label: 'Handout settings', icon: 'sliders', href: '/admin/handout-settings.html', roles: SUPER, ready: false },
     { key: 'tokens', label: 'Tokens', icon: 'key', href: '/admin/tokens.html', roles: SUPER, ready: false },
