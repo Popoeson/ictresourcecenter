@@ -381,6 +381,28 @@ a { color: var(--text); }
   .shell-main { padding: 32px 24px 48px; }
 }
 
+/* ---------- Page heading row and structure tree ---------- */
+.shell-heading-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 16px; }
+.icon-btn-sm { min-width: 40px; min-height: 40px; padding: 0 6px; }
+.btn .icon-plus, .btn svg { flex-shrink: 0; }
+.tree-card { margin-bottom: 16px; padding: 16px; }
+.tree-row { display: flex; align-items: center; gap: 8px; }
+.tree-name { flex: 1; min-width: 0; }
+.tree-name .hint { margin: 0; }
+.tree-title { font-weight: 500; overflow-wrap: anywhere; }
+.tree-title-lg { font-size: 18px; }
+.tree-actions { display: flex; flex-shrink: 0; }
+.tree-toggle svg { transform: rotate(-90deg); transition: transform 0.15s; }
+.tree-toggle.open svg { transform: none; }
+.tree-children { margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--border); }
+.tree-dept { padding: 12px 0 16px; border-bottom: 1px solid var(--border); }
+.tree-children > .tree-dept:last-of-type { border-bottom: 0; }
+.tree-levels { list-style: none; margin: 8px 0 12px; padding: 0 0 0 8px; }
+.tree-level { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.tree-level .tree-title { flex: 1; min-width: 0; font-weight: 400; }
+.inactive > .tree-row .tree-title, .tree-dept.inactive > .tree-row .tree-title, .tree-level.inactive .tree-title { color: var(--text-muted); }
+.tree-children > .btn { margin-top: 12px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
