@@ -433,6 +433,24 @@ a { color: var(--text); }
   .price-row .btn { min-height: 48px; }
 }
 
+/* ---------- Prices: filters and collapsible cards ---------- */
+[hidden] { display: none !important; }
+.filter-bar .field { margin: 0; }
+.filter-actions { margin: 12px 0 8px; }
+.price-card { padding: 16px; }
+.price-card .price-card-heading { margin: 0; font-size: 20px; font-weight: 500; }
+.price-card-head {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0;
+  background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.price-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 20px; font-weight: 500; }
+.price-card-summary { margin-left: auto; font-size: 14px; font-weight: 400; color: var(--text-muted); }
+.price-card-chevron svg { display: block; transition: transform 0.15s; }
+.price-card.collapsed .price-card-chevron svg { transform: rotate(-90deg); }
+.price-card.collapsed .price-body { display: none; }
+.price-body { margin-top: 8px; }
+.price-dept-group { margin-top: 4px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
