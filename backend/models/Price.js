@@ -18,7 +18,6 @@ const priceSchema = new mongoose.Schema(
     levelKey: { type: String, required: true },
     levelLabel: { type: String, trim: true },
     ictFee: koboField,
-    assignmentPerFile: koboField,
     handoutPrice: koboField,
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', default: null },
   },
