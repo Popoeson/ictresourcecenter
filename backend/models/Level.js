@@ -6,7 +6,17 @@ const levelSchema = new mongoose.Schema(
     institution: { type: mongoose.Schema.Types.ObjectId, ref: 'Institution', required: true },
     department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
     name: { type: String, required: true, trim: true },
-    levelKey: { type: String },
+        levelKey: { type: String },
+    // Assignment price per file, in kobo. Null means not set yet.
+    assignmentPerFile: {
+      type: Number,
+      default: null,
+      min: 0,
+      validate: {
+        validator: (v) => v === null || Number.isInteger(v),
+        message: 'Amount must be a whole number of kobo',
+      },
+    },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
