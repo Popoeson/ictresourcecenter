@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Imports | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Import students</h1>
+      <p class="muted">Load students from the Google Form responses file.</p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <section class="card import-card">
+      <h2>Before you upload</h2>
+      <ol class="import-steps">
+        <li>Set up institutions, departments and levels in Structure first.</li>
+        <li>Names in the file must match them exactly (case and extra spaces are ignored).</li>
+        <li>Columns: Surname, Firstname, Othername, Department, Phone, Email, Institution, Level.</li>
+        <li>Each row needs an email or a phone number. Rows already in the list are skipped.</li>
+      </ol>
+      <p class="hint">Excel (.xlsx) or CSV. Up to 5 MB and 5,000 rows.</p>
+      <a class="btn btn-secondary btn-small" href="/api/admin/import/template" download>Download template</a>
+    </section>
+
+    <section class="card import-card">
+      <h2>Upload a file</h2>
+      <label class="dropzone" id="dropzone" for="import-file">
+        <span id="dropzone-icon"></span>
+        <p class="dropzone-title">Choose a file</p>
+        <p class="hint">or drop an Excel (.xlsx) or CSV file here</p>
+        <input class="sr-only" type="file" id="import-file" accept=".xlsx,.csv">
+      </label>
+      <div class="file-chip hidden" id="file-chip">
+        <div>
+          <div class="file-chip-name" id="file-name"></div>
+          <div class="hint" id="file-size"></div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" id="file-remove">Remove</button>
+      </div>
+      <div class="btn-row import-actions">
+        <button type="button" class="btn btn-primary" id="import-btn" disabled>Upload and import</button>
+      </div>
+      <div id="import-result" aria-live="polite"></div>
+    </section>
+
+    <section class="card import-card">
+      <h2>Recent imports</h2>
+      <p class="hint" id="batches-status" aria-live="polite"></p>
+      <div id="batches-empty" class="hidden"><p class="empty-state">No imports yet.</p></div>
+      <div class="table-wrap hidden" id="batches-wrap">
+        <table class="table responsive">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Uploaded by</th>
+              <th>Date</th>
+              <th>Rows</th>
+              <th>Added</th>
+              <th>Duplicates</th>
+              <th>Rejected</th>
+              <th><span class="sr-only">Rejected rows file</span></th>
+            </tr>
+          </thead>
+          <tbody id="batches-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/import.js"></script>
+</body>
+</html>
