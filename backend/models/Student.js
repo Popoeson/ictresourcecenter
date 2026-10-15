@@ -39,12 +39,11 @@ studentSchema.pre('validate', function () {
   this.emailKey = e || undefined;
 });
 
-studentSchema.index({ institution: 1, level: 1, searchTokens: 1 });
 studentSchema.index(
   { emailKey: 1 },
   { unique: true, partialFilterExpression: { emailKey: { $exists: true }, isDeleted: false } }
 );
 studentSchema.index({ phoneKey: 1 });
-studentSchema.index(
+studentSchema.index({ institution: 1, levelKey: 1, searchTokens: 1 });
 
 module.exports = mongoose.model('Student', studentSchema, 'students');
