@@ -7,6 +7,7 @@ const paystack = require('./paystackProvider');
 // Paystack needs an email. Students who only gave a phone number get a placeholder.
 const NO_EMAIL_DOMAIN = 'noemail.example.com';
 const REF_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const DEFAULT_MAX_FILES = 10;
 
 function generateReference() {
   let s = '';
@@ -28,6 +29,8 @@ async function loadStudent(studentId) {
   return student;
 }
 
+/* ---------- ICT fee ---------- */
+
 // The ICT fee comes from the price row for the student's institution and level name.
 async function feeAmountFor(student) {
   if (student.ictFeePaid || (await Payment.exists({ student: student._id, type: 'ict_fee', status: 'success' }))) {
@@ -48,43 +51,70 @@ async function quoteIctFee(studentId) {
   return { alreadyPaid: false, amount: await feeAmountFor(student), currency: 'NGN' };
 }
 
-// The assignment price per file comes from the student's own department and level.
-async function assignmentAmountFor(student, fileCount) {
-  const files = Number(fileCount);
-  const setting = await Setting.findOne({ key: 'global' }).select('maxFilesPerPurchase').lean();
-  const max = (setting && setting.maxFilesPerPurchase) || 10;
-  if (!Number.isInteger(files) || files < 1 || files > max) {
-    throw new AppError('Choose between 1 and ' + max + ' files.', 400, 'BAD_FILE_COUNT');
-  }
-  const level = await Level.findById(student.level).select('assignmentPerFile');
-  const pricePerFile = level && level.assignmentPerFile;
-  if (!Number.isInteger(pricePerFile) || pricePerFile <= 0) {
-    throw new AppError('The assignment price has not been set yet. Please contact your course lecturer.', 400, 'PRICE_NOT_SET');
-  }
-  return { amount: pricePerFile * files, pricePerFile, files, maxFiles: max };
+/* ---------- Assignment ---------- */
+
+async function maxFilesPerPurchase() {
+  const s = await Setting.findOne({ key: 'global' }).select('maxFilesPerPurchase').lean();
+  return (s && s.maxFilesPerPurchase) || DEFAULT_MAX_FILES;
 }
 
-// Total shown to the student before paying (kobo)
-async function quoteAssignment(studentId, fileCount) {
+async function checkFileCount(files) {
+  const max = await maxFilesPerPurchase();
+  const n = Number(files);
+  if (!Number.isInteger(n) || n < 1 || n > max) {
+    throw new AppError('Choose between 1 and ' + max + ' files.', 400, 'BAD_FILE_COUNT');
+  }
+  return { count: n, max };
+}
+
+// The assignment price per file comes from the student's own department and level.
+async function assignmentPriceFor(student) {
+  const level = await Level.findById(student.level).select('assignmentPerFile');
+  if (!level || !Number.isInteger(level.assignmentPerFile) || level.assignmentPerFile <= 0) {
+    throw new AppError('The assignment price has not been set yet. Please contact your course lecturer.', 400, 'PRICE_NOT_SET');
+  }
+  return level.assignmentPerFile;
+}
+
+async function quoteAssignment(studentId, files) {
   const student = await loadStudent(studentId);
-  const a = await assignmentAmountFor(student, fileCount);
-  return { amount: a.amount, pricePerFile: a.pricePerFile, files: a.files, maxFiles: a.maxFiles, currency: 'NGN' };
+  const { count, max } = await checkFileCount(files === undefined || files === '' ? 1 : files);
+  const pricePerFile = await assignmentPriceFor(student);
+  return { pricePerFile, files: count, maxFiles: max, amount: pricePerFile * count, currency: 'NGN' };
+}
+
+/* ---------- Quote and initialize ---------- */
+
+async function quote({ type, studentId, files }) {
+  if (type === 'ict_fee') return quoteIctFee(studentId);
+  if (type === 'assignment') return quoteAssignment(studentId, files);
+  throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
 }
 
 // Creates the pending payment and returns the Paystack link. The amount is always calculated here.
-async function initializePayment({ type, studentId }) {
-  if (type !== 'ict_fee') {
+async function initializePayment({ type, studentId, files }) {
+  if (type !== 'ict_fee' && type !== 'assignment') {
     throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
   }
 
   const student = await loadStudent(studentId);
-  const amount = await feeAmountFor(student);
+  let amount;
+  let details;
+  if (type === 'ict_fee') {
+    amount = await feeAmountFor(student);
+  } else {
+    const { count } = await checkFileCount(files);
+    const pricePerFile = await assignmentPriceFor(student);
+    amount = pricePerFile * count;
+    details = { fileCount: count, pricePerFile };
+  }
+
   const reference = generateReference();
   const email = student.email || reference.toLowerCase() + '@' + NO_EMAIL_DOMAIN;
 
   const payment = await Payment.create({
     reference,
-    type: 'ict_fee',
+    type,
     status: 'pending',
     amount,
     currency: 'NGN',
@@ -93,6 +123,7 @@ async function initializePayment({ type, studentId }) {
     institution: student.institution,
     department: student.department,
     level: student.level,
+    details,
   });
 
   try {
@@ -101,7 +132,7 @@ async function initializePayment({ type, studentId }) {
       amountKobo: amount,
       reference,
       callbackUrl: callbackUrlFor(reference),
-      metadata: { type: 'ict_fee', studentId: String(student._id) },
+      metadata: { type, studentId: String(student._id), fileCount: details ? details.fileCount : undefined },
       split: null,
     });
     payment.providerData = { accessCode: init.accessCode, authorizationUrl: init.authorizationUrl };
@@ -115,4 +146,4 @@ async function initializePayment({ type, studentId }) {
   }
 }
 
-module.exports = { initializePayment, quoteIctFee, generateReference, callbackUrlFor };
+module.exports = { initializePayment, quote, quoteIctFee, quoteAssignment, generateReference, callbackUrlFor };
