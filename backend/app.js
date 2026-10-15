@@ -48,13 +48,13 @@ app.use('/api/admin/prices', priceRoutes);
 app.use('/api/admin/students', studentRoutes);
 app.use('/api/admin/import', importRoutes);
 app.use('/api/admin/admins', adminRoutes);
+app.use('/api/admin/payments', paymentAdminRoutes);
 app.use('/api/admin', structureRoutes);
 app.use('/api/lookups', lookupRoutes);
 app.use('/api/students', studentSearchRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/admin/admins', adminRoutes);
-app.use('/api/admin/payments', paymentAdminRoutes);
+app.use('/api/receipts', receiptRoutes);
 app.use('/api', notFound);
 app.use(errorHandler);
 
