@@ -123,7 +123,7 @@
   }
 
   function renderSummary(s) {
-    if (!isSuper || !s) return;
+    if (!s) return;
     $('st-total').textContent = UI.naira(s.collectedTotal);
     $('st-count').textContent = String(s.collectedCount);
     $('st-pending').textContent = String(s.pendingCount);
@@ -252,10 +252,9 @@
 
   Auth.init({ page: 'payments' }).then(function (admin) {
     isSuper = admin.role === 'superadmin';
-    if (isSuper) {
-      el.stats.classList.remove('hidden');
-    } else {
-      $('page-sub').textContent = 'Every payment made on the site. You have view-only access.';
+        el.stats.classList.remove('hidden');
+    if (!isSuper) {
+      $('page-sub').textContent = 'Every payment made on the site.';
     }
 
     Api.get('/lookups/institutions').then(function (list) {
