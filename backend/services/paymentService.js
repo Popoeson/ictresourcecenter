@@ -40,10 +40,12 @@ async function feeAmountFor(student) {
   return price.ictFee;
 }
 
-// Amount shown to the student before paying (kobo)
+// Amount shown to the student before paying (kobo). If the fee is already paid, the receipt reference is returned.
 async function quoteIctFee(studentId) {
   const student = await loadStudent(studentId);
-  return { amount: await feeAmountFor(student), currency: 'NGN' };
+  const paid = await Payment.findOne({ student: student._id, type: 'ict_fee', status: 'success' }).select('reference');
+  if (paid) return { alreadyPaid: true, reference: paid.reference };
+  return { alreadyPaid: false, amount: await feeAmountFor(student), currency: 'NGN' };
 }
 
 // Creates the pending payment and returns the Paystack link. The amount is always calculated here.
