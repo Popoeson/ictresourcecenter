@@ -20,6 +20,7 @@ const verifyLimiter = makeLimiter({
 const initSchema = z.object({
   type: z.enum(['ict_fee', 'assignment', 'handout']),
   studentId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid student.'),
+  files: z.number().int().min(1).max(100).optional(),
 });
 const refParams = z.object({
   reference: z.string().regex(/^[A-Za-z0-9_-]{6,64}$/, 'Invalid reference.'),
