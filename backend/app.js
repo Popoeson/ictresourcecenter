@@ -17,12 +17,16 @@ const adminRoutes = require('./routes/adminRoutes');
 const studentSearchRoutes = require('./routes/studentSearchRoutes');
 const pricingRoutes = require('./routes/pricingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const receiptRoutes = require('./routes/receiptRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 const app = express();
 
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(cors({ origin: env.frontendUrl, credentials: true }));
+// The Paystack webhook needs the raw body, so it is mounted before the JSON parser
+app.use('/api/paystack/webhook', webhookRoutes);
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());
