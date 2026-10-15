@@ -15,6 +15,7 @@ const limiter = makeLimiter({
 const quoteSchema = z.object({
   type: z.enum(['ict_fee', 'assignment', 'handout']),
   studentId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid student.'),
+  files: z.string().regex(/^\d{1,3}$/, 'Enter a valid number of files.').optional(),
 });
 
 router.get('/quote', limiter, validate(quoteSchema, 'query'), c.quote);
