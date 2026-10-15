@@ -14,7 +14,9 @@ const priceRoutes = require('./routes/priceRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const importRoutes = require('./routes/importRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-
+const studentSearchRoutes = require('./routes/studentSearchRoutes');
+const pricingRoutes = require('./routes/pricingRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const app = express();
 
 app.set('trust proxy', env.trustProxyHops);
