@@ -45,6 +45,9 @@ app.use('/api/admin/import', importRoutes);
 app.use('/api/admin/admins', adminRoutes);
 app.use('/api/admin', structureRoutes);
 app.use('/api/lookups', lookupRoutes);
+app.use('/api/students', studentSearchRoutes);
+app.use('/api/pricing', pricingRoutes);
+app.use('/api/payments', paymentRoutes);
 app.use('/api', notFound);
 app.use(errorHandler);
 
