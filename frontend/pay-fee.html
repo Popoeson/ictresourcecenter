@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pay ICT Fee | ICT Course Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="/">ICT Course Portal</a>
+      <a class="header-link" href="/admin/login.html">Admin</a>
+    </header>
+
+    <div class="sheet-page sheet-narrow">
+      <main>
+        <a class="back-link" href="/">&lsaquo; Back</a>
+        <h1 class="page-title">Pay ICT fee</h1>
+        <p class="lead">A one-time payment for the course.</p>
+
+        <div id="page-alert" aria-live="polite"></div>
+
+        <div class="field">
+          <label for="f-inst">Institution</label>
+          <select class="select" id="f-inst"></select>
+        </div>
+
+        <div class="field hidden" id="level-field">
+          <label for="f-level">Level</label>
+          <select class="select" id="f-level"></select>
+        </div>
+
+        <div class="hidden" id="name-field">
+          <div id="search-block">
+            <div class="field">
+              <label for="f-q">Your name</label>
+              <input class="input" id="f-q" type="search" placeholder="Type at least 3 letters of your name" autocomplete="off">
+              <p class="hint" id="search-status" aria-live="polite"></p>
+            </div>
+            <div id="name-results" aria-live="polite"></div>
+          </div>
+
+          <div class="field hidden" id="chosen">
+            <label>Your name</label>
+            <div class="chosen-card">
+              <div>
+                <div class="name-result-name" id="chosen-name"></div>
+                <div class="name-result-dept" id="chosen-dept"></div>
+              </div>
+              <button type="button" class="btn btn-secondary btn-small" id="chosen-change">Change</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="fee-card hidden" id="fee-card" aria-labelledby="fee-title">
+          <p class="fee-label" id="fee-title">ICT course fee</p>
+          <p class="fee-amount" id="fee-amount"></p>
+          <p class="hint" id="fee-for"></p>
+          <p class="hint">One-time payment, made securely through Paystack.</p>
+        </section>
+        <button type="button" class="btn btn-primary btn-block hidden" id="pay-btn"></button>
+
+        <section class="hidden" id="paid-card">
+          <div class="alert alert-success" role="status">
+            <strong>Fee already paid</strong>
+            <span>Your ICT fee has already been paid.</span>
+          </div>
+          <a class="btn btn-secondary btn-block" id="receipt-link" href="#" download>Download receipt</a>
+        </section>
+      </main>
+    </div>
+
+    <footer class="site-footer-line">
+      <p>Need help? Contact your course lecturer. &copy; <span id="year"></span></p>
+    </footer>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/pages/pay-fee.js"></script>
+</body>
+</html>
