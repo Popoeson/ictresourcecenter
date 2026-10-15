@@ -18,6 +18,7 @@ const studentSearchRoutes = require('./routes/studentSearchRoutes');
 const pricingRoutes = require('./routes/pricingRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const receiptRoutes = require('./routes/receiptRoutes');
+const paymentAdminRoutes = require('./routes/paymentAdminRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const app = express();
 
@@ -52,7 +53,8 @@ app.use('/api/lookups', lookupRoutes);
 app.use('/api/students', studentSearchRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/receipts', receiptRoutes);
+app.use('/api/admin/admins', adminRoutes);
+app.use('/api/admin/payments', paymentAdminRoutes);
 app.use('/api', notFound);
 app.use(errorHandler);
 
