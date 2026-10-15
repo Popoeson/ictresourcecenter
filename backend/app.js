@@ -52,6 +52,7 @@ app.use('/api/lookups', lookupRoutes);
 app.use('/api/students', studentSearchRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/receipts', receiptRoutes);
 app.use('/api', notFound);
 app.use(errorHandler);
 
