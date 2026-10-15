@@ -9,7 +9,10 @@ const env = {
   jwtSecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
-  paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
+    paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
   cookieName: 'ict_session',
 };
 
