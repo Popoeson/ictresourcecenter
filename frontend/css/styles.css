@@ -493,6 +493,15 @@ a { color: var(--text); }
 .detail-row dd { margin: 0; font-weight: 500; text-align: right; overflow-wrap: anywhere; }
 .btn-gap { margin-top: 8px; }
 
+/* ---------- Receipt QR code ---------- */
+.qr-block {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  margin: 0 0 24px; padding: 16px; background: #fff;
+  border: 1px solid var(--border); border-radius: 16px;
+}
+.qr-block p { margin: 0; text-align: center; }
+.qr-img { display: block; width: 160px; height: 160px; background: #fff; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
