@@ -7,7 +7,9 @@ const env = {
   superAdminEmail: process.env.SUPER_ADMIN_EMAIL,
     superAdminPassword: process.env.SUPER_ADMIN_PASSWORD,
   jwtSecret: process.env.JWT_SECRET,
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
+  paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
+  paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
   cookieName: 'ict_session',
 };
 
