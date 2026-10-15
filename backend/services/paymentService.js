@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { Payment, Student, Price } = require('../models');
+const { Payment, Student, Price, Level, Setting } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { env } = require('../config/env');
 const paystack = require('./paystackProvider');
@@ -46,6 +46,29 @@ async function quoteIctFee(studentId) {
   const paid = await Payment.findOne({ student: student._id, type: 'ict_fee', status: 'success' }).select('reference');
   if (paid) return { alreadyPaid: true, reference: paid.reference };
   return { alreadyPaid: false, amount: await feeAmountFor(student), currency: 'NGN' };
+}
+
+// The assignment price per file comes from the student's own department and level.
+async function assignmentAmountFor(student, fileCount) {
+  const files = Number(fileCount);
+  const setting = await Setting.findOne({ key: 'global' }).select('maxFilesPerPurchase').lean();
+  const max = (setting && setting.maxFilesPerPurchase) || 10;
+  if (!Number.isInteger(files) || files < 1 || files > max) {
+    throw new AppError('Choose between 1 and ' + max + ' files.', 400, 'BAD_FILE_COUNT');
+  }
+  const level = await Level.findById(student.level).select('assignmentPerFile');
+  const pricePerFile = level && level.assignmentPerFile;
+  if (!Number.isInteger(pricePerFile) || pricePerFile <= 0) {
+    throw new AppError('The assignment price has not been set yet. Please contact your course lecturer.', 400, 'PRICE_NOT_SET');
+  }
+  return { amount: pricePerFile * files, pricePerFile, files, maxFiles: max };
+}
+
+// Total shown to the student before paying (kobo)
+async function quoteAssignment(studentId, fileCount) {
+  const student = await loadStudent(studentId);
+  const a = await assignmentAmountFor(student, fileCount);
+  return { amount: a.amount, pricePerFile: a.pricePerFile, files: a.files, maxFiles: a.maxFiles, currency: 'NGN' };
 }
 
 // Creates the pending payment and returns the Paystack link. The amount is always calculated here.
