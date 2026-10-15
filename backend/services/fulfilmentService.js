@@ -1,8 +1,9 @@
-const { Payment, Student } = require('../models');
+const { Payment, Student, Token } = require('../models');
 const Counter = require('../models/Counter');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../config/logger');
 const paystack = require('./paystackProvider');
+const tokenService = require('./tokenService');
 
 // The callback page, the webhook and the Super Admin "re-verify" all use this file,
 // so a payment is fulfilled exactly once whichever path gets there first.
@@ -65,16 +66,61 @@ async function fulfilPayment(reference, via, ps) {
       { _id: won.student },
       { $set: { ictFeePaid: true, ictFeePaidAt: won.confirmedAt, ictFeePayment: won._id } }
     );
+  } else if (won.type === 'assignment') {
+    // The 30-minute window starts now, at payment confirmation.
+    // If this fails, the payment stays successful and the token is created when the callback page is next opened.
+    try {
+      await tokenService.createToken({
+        student: won.student,
+        payment: won._id,
+        source: 'payment',
+        filesAllowed: (won.details && won.details.fileCount) || 1,
+        startsAt: won.confirmedAt,
+      });
+    } catch (err) {
+      logger.error({ reference, err: err.message }, 'Token creation failed after payment');
+    }
   }
-  // Assignment (tokens) and handout actions are added in phases 5 and 6.
+  // The handout action is added in phase 6.
 
   logger.info({ reference, via, type: won.type }, 'Payment fulfilled');
   return Payment.findById(won._id);
 }
 
+// The token details for a paid assignment. The code is shown only while the token can still be used.
+// If the token is missing (an earlier failure), it is created now with the original confirmation time.
+async function tokenInfo(reference) {
+  const payment = await Payment.findOne({ reference, status: 'success', type: 'assignment' });
+  if (!payment) return null;
+
+  let token = await Token.findOne({ payment: payment._id });
+  if (!token) {
+    token = await tokenService.createToken({
+      student: payment.student,
+      payment: payment._id,
+      source: 'payment',
+      filesAllowed: (payment.details && payment.details.fileCount) || 1,
+      startsAt: payment.confirmedAt || new Date(),
+    });
+  }
+
+  const now = Date.now();
+  const live = (token.status === 'active' || token.status === 'in_progress') && token.expiresAt.getTime() > now;
+  let status = token.status;
+  if (!live && status !== 'used' && status !== 'revoked') status = 'expired';
+
+  return {
+    status,
+    code: live ? token.code : null,
+    filesAllowed: token.filesAllowed,
+    expiresAt: token.expiresAt,
+    secondsLeft: live ? Math.max(0, Math.floor((token.expiresAt.getTime() - now) / 1000)) : 0,
+  };
+}
+
 // Checks the payment with Paystack by reference and fulfils it when it succeeded.
 // outcome: success | not_completed | processing | flagged
-async function verifyAndFulfil(reference, via) {
+async function verifyCore(reference, via) {
   let payment = await Payment.findOne({ reference });
   if (!payment) throw new AppError('Payment not found.', 404, 'NOT_FOUND');
 
@@ -118,4 +164,13 @@ async function verifyAndFulfil(reference, via) {
   return { outcome: 'processing', payment: summary(payment) };
 }
 
-module.exports = { verifyAndFulfil, fulfilPayment, ensureReceiptNumber, summary, flag };
+// Same as above, and for a paid assignment it adds the token details for the callback page.
+async function verifyAndFulfil(reference, via) {
+  const result = await verifyCore(reference, via);
+  if (result.outcome === 'success' && result.payment.type === 'assignment') {
+    result.token = await tokenInfo(reference);
+  }
+  return result;
+}
+
+module.exports = { verifyAndFulfil, fulfilPayment, ensureReceiptNumber, summary, flag, tokenInfo };
