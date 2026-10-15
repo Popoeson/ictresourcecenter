@@ -16,6 +16,8 @@ const refParams = z.object({
   reference: z.string().regex(/^[A-Za-z0-9_-]{6,64}$/, 'Invalid reference.'),
 });
 
+router.get('/:reference/verify', limiter, validate(refParams, 'params'), c.verify);
+router.get('/:reference/qr.png', limiter, validate(refParams, 'params'), c.qrImage);
 router.get('/:reference', limiter, validate(refParams, 'params'), c.download);
 
 module.exports = router;
