@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Payments | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Payments</h1>
+      <p class="muted" id="page-sub">Every payment made on the site.</p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="stat-grid hidden" id="stat-grid">
+      <div class="stat-card"><div class="stat-value" id="st-total">-</div><div class="stat-label">Total collected</div></div>
+      <div class="stat-card"><div class="stat-value" id="st-count">-</div><div class="stat-label">Successful payments</div></div>
+      <div class="stat-card"><div class="stat-value" id="st-pending">-</div><div class="stat-label">Pending</div></div>
+      <div class="stat-card"><div class="stat-value" id="st-flagged">-</div><div class="stat-label">Flagged</div></div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-q">Search</label>
+        <input class="input" id="f-q" type="search" placeholder="Name, reference or receipt number" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-type">Payment for</label>
+        <select class="select" id="f-type">
+          <option value="">All</option>
+          <option value="ict_fee">ICT fee</option>
+          <option value="assignment">Assignment</option>
+          <option value="handout">Handout</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-status">Status</label>
+        <select class="select" id="f-status">
+          <option value="">All</option>
+          <option value="success">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="flagged">Flagged</option>
+          <option value="failed">Failed</option>
+          <option value="abandoned">Abandoned</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-inst">Institution</label>
+        <select class="select" id="f-inst"></select>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select class="select" id="f-dept" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-level">Level</label>
+        <select class="select" id="f-level" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-from">From</label>
+        <input class="input" id="f-from" type="date">
+      </div>
+      <div class="field">
+        <label for="f-to">To</label>
+        <input class="input" id="f-to" type="date">
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="payments-count" aria-live="polite"></p>
+
+    <div id="payments-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="payments-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Paid by</th>
+            <th>Payment for</th>
+            <th>Class</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Reference</th>
+            <th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="payments-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/payments.js"></script>
+</body>
+</html>
