@@ -1,9 +1,9 @@
 const PDFDocument = require('pdfkit');
 
 const TYPE_LABEL = {
-  ict_fee: 'ICT course fee',
-  assignment: 'Assignment submission',
-  handout: 'Course handout',
+  ict_fee: 'ICT Course Fee',
+  assignment: 'Assignment Submission',
+  handout: 'Course Handout',
 };
 
 // The PDF's built-in font has no naira sign, so amounts are written as "NGN".
@@ -26,7 +26,7 @@ function row(doc, label, value) {
 }
 
 // payment: a successful payment with institution and level populated (name only)
-function buildReceipt(payment) {
+function buildReceipt(payment, qrPng) {
   const doc = new PDFDocument({
     size: 'A5',
     margin: 40,
@@ -54,8 +54,17 @@ function buildReceipt(payment) {
   row(doc, 'Amount paid', money(payment.amount));
   row(doc, 'Reference', payment.reference);
 
-  doc.moveDown(1);
+    doc.moveDown(1);
   doc.font('Helvetica').fontSize(9).fillColor('#6B6B6B').text('Keep this receipt for your records.', 40);
+
+  if (qrPng) {
+    const y = doc.y + 16;
+    doc.image(qrPng, 40, y, { width: 96, height: 96 });
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#1B1B1B')
+      .text('Scan to verify', 150, y + 30, { width: doc.page.width - 190 });
+    doc.font('Helvetica').fontSize(9).fillColor('#6B6B6B')
+      .text('Scan this code with a phone camera to check that this receipt is genuine.', 150, y + 46, { width: doc.page.width - 190 });
+  }
   return doc;
 }
 
