@@ -38,7 +38,11 @@
         detailRow('Date', UI.fmtDate(p.paidAt)) +
         detailRow('Receipt number', p.receiptNumber) +
         detailRow('Reference', p.reference) +
-      '</dl>' +
+            '</dl>' +
+      '<div class="qr-block">' +
+        '<img class="qr-img" src="/api/receipts/' + encodeURIComponent(p.reference) + '/qr.png" width="160" height="160" alt="QR code for verifying this receipt">' +
+        '<p class="hint">Show this code to your lecturer to verify your receipt.</p>' +
+      '</div>' +
       '<a class="btn btn-primary btn-block" href="/api/receipts/' + encodeURIComponent(p.reference) + '" download>Download receipt</a>' +
       '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>' +
       keepNote();
