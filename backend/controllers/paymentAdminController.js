@@ -93,14 +93,11 @@ async function list(req, res, next) {
         .skip((page - 1) * limit)
         .limit(limit),
       Payment.countDocuments(filter),
-      // Money totals are for the Super Admin only. They ignore the status filter so the breakdown stays visible.
-      isSuper
-        ? Payment.aggregate([
-            { $match: buildFilter(req.query, false) },
-            { $group: { _id: '$status', count: { $sum: 1 }, total: { $sum: '$amount' } } },
-          ])
-        : Promise.resolve(null),
-    ]);
+            // Totals ignore the status filter so the breakdown stays visible. Shown to Admin and Super Admin.
+      Payment.aggregate([
+        { $match: buildFilter(req.query, false) },
+        { $group: { _id: '$status', count: { $sum: 1 }, total: { $sum: '$amount' } } },
+      ]),
 
     let summary = null;
     if (groups) {
