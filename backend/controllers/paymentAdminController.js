@@ -97,7 +97,8 @@ async function list(req, res, next) {
       Payment.aggregate([
         { $match: buildFilter(req.query, false) },
         { $group: { _id: '$status', count: { $sum: 1 }, total: { $sum: '$amount' } } },
-      ]),
+            ]),
+    ]);
 
     let summary = null;
     if (groups) {
