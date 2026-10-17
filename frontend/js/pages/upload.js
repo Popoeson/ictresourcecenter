@@ -2,7 +2,7 @@
   'use strict';
 
   // Keep this in step with the server's allowed types (fileService). The server is the final check.
-  var ALLOWED = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+  var ALLOWED = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp'];
   var MAX_BYTES = 5 * 1024 * 1024;
 
   function $(id) { return document.getElementById(id); }
