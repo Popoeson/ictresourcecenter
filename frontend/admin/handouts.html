@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Handout orders | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Handout orders</h1>
+      <p class="muted">Everyone who bought the handout. Search by pickup code to mark a hard copy as collected.</p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-q">Search</label>
+        <input class="input" id="f-q" type="search" placeholder="Name, email, phone or pickup code" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-delivery">Delivery</label>
+        <select class="select" id="f-delivery">
+          <option value="">All</option>
+          <option value="pdf">PDF download</option>
+          <option value="pickup">Pickup</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-buyer">Buyer</label>
+        <select class="select" id="f-buyer">
+          <option value="">All</option>
+          <option value="student">Student</option>
+          <option value="non_student">Non-student</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-pickup">Pickup</label>
+        <select class="select" id="f-pickup">
+          <option value="">All</option>
+          <option value="pending">Waiting</option>
+          <option value="collected">Collected</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-inst">Institution</label>
+        <select class="select" id="f-inst"></select>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select class="select" id="f-dept" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-level">Level</label>
+        <select class="select" id="f-level" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-from">From</label>
+        <input class="input" id="f-from" type="date">
+      </div>
+      <div class="field">
+        <label for="f-to">To</label>
+        <input class="input" id="f-to" type="date">
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="orders-pending" aria-live="polite"></p>
+    <p class="hint" id="orders-count" aria-live="polite"></p>
+
+    <div id="orders-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="orders-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Buyer</th>
+            <th>Class</th>
+            <th>Delivery</th>
+            <th>Buyer type</th>
+            <th>Pickup</th>
+            <th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/handouts.js"></script>
+</body>
+</html>
