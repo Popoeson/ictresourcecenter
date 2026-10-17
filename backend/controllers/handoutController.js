@@ -1,4 +1,5 @@
 const handoutService = require('../services/handoutService');
+const handoutOrderService = require('../services/handoutOrderService');
 
 function send(res, data, status = 200) {
   res.status(status).json({ success: true, data });
@@ -33,4 +34,13 @@ async function initialize(req, res, next) {
   }
 }
 
-module.exports = { quote, initialize };
+// A fresh short-lived download link for a paid PDF order
+async function link(req, res, next) {
+  try {
+    send(res, await handoutOrderService.signedLinkFor(req.params.reference));
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { quote, initialize, link };
