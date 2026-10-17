@@ -86,6 +86,11 @@ function assignmentFolder(institutionName, levelName) {
   return 'ict/assignments/' + slug(institutionName) + '/' + slug(levelName);
 }
 
+// ict/handouts/{institution}/{department}/{level}
+function handoutFolder(institutionName, departmentName, levelName) {
+  return 'ict/handouts/' + slug(institutionName) + '/' + slug(departmentName) + '/' + slug(levelName);
+}
+
 // Stores one file privately under a random name. Returns the details to save on the submission.
 async function uploadBuffer({ buffer, folder, extension, resourceType }) {
   const c = client();
@@ -125,4 +130,4 @@ async function destroy(publicId, resourceType) {
   }
 }
 
-module.exports = { validateFile, uploadBuffer, destroy, assignmentFolder, extensionOf, RULES };
+module.exports = { validateFile, uploadBuffer, destroy, assignmentFolder, handoutFolder, extensionOf, RULES };
