@@ -23,11 +23,12 @@
 
   function keepNote(type) {
     return '<p class="hint">Keep this page link. You can open it again to see your ' +
-      (type === 'assignment' ? 'token or receipt.' : 'receipt.') + '</p>';
+      (type === 'assignment' ? 'token or receipt.' : type === 'handout' ? 'handout, pickup code or receipt.' : 'receipt.') + '</p>';
   }
 
   function retryHref(p) {
     if (p && p.type === 'assignment') return '/submit-assignment.html';
+    if (p && p.type === 'handout') return '/buy-handout.html';
     if (!p || p.type === 'ict_fee') return '/pay-fee.html';
     return '/';
   }
@@ -63,9 +64,10 @@
 
   /* ---------- States ---------- */
 
-  function renderSuccess(p, token) {
+  function renderSuccess(p, token, handout) {
     lastPayment = p;
     if (p.type === 'assignment') return renderAssignment(p, token);
+    if (p.type === 'handout') return renderHandout(p, handout);
 
     setTitle('Payment received');
     var intro = p.type === 'ict_fee'
@@ -113,7 +115,7 @@
   }
 
   function copyToken(code) {
-    function done() { UI.toast('Token copied', 'success'); }
+    function done() { UI.toast('Code copied', 'success'); }
     function fallback() {
       try {
         var range = document.createRange();
@@ -123,7 +125,7 @@
         sel.addRange(range);
         if (document.execCommand('copy')) { done(); return; }
       } catch (e) { /* fall through */ }
-      UI.toast('Press and hold the token to copy it.', 'info');
+      UI.toast('Press and hold the code to copy it.', 'info');
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(code).then(done, fallback);
@@ -172,6 +174,65 @@
     stateEl.innerHTML = message + detailsHtml(p, rows) + receiptHtml(p, false);
   }
 
+  function renderHandout(p, h) {
+    setTitle('Payment received');
+    var rows = h ? detailRow('Delivery', h.delivery === 'pdf' ? 'PDF download' : 'Pickup') : '';
+    var details = detailsHtml(p, rows);
+
+    if (!h) {
+      stateEl.innerHTML =
+        UI.alertHtml('success', 'Your payment was received.',
+          'We are still preparing your order. Reload this page in a moment. Your receipt is ready below.') +
+        details + receiptHtml(p, true);
+      return;
+    }
+
+    if (h.delivery === 'pickup') {
+      var intro = h.pickupStatus === 'collected'
+        ? UI.alertHtml('info', 'This copy has been collected.', 'Your receipt is below.')
+        : UI.alertHtml('success', 'Your payment was received.', 'Show your pickup code when you collect your copy.');
+      stateEl.innerHTML = intro +
+        '<section class="token-card" aria-label="Your pickup code">' +
+          '<p class="token-label">Your pickup code</p>' +
+          '<p class="token-code" id="token-code">' + UI.esc(h.pickupCode) + '</p>' +
+          '<button type="button" class="btn btn-secondary btn-small" id="copy-pickup">Copy code</button>' +
+          '<p class="hint">Show this code to your course lecturer when you collect your copy.</p>' +
+        '</section>' +
+        details + receiptHtml(p, true);
+      $('copy-pickup').addEventListener('click', function () { copyToken(h.pickupCode); });
+      return;
+    }
+
+    var intro2 = h.pdfAvailable
+      ? UI.alertHtml('success', 'Your payment was received.', 'Download your handout below.')
+      : UI.alertHtml('warning', 'Your handout PDF is not available right now.',
+          'Please contact your course lecturer and give them your reference. Your receipt is below.');
+    var action = h.pdfAvailable
+      ? '<button type="button" class="btn btn-primary btn-block" id="download-handout">Download handout</button>'
+      : '';
+    stateEl.innerHTML = intro2 + action + details + receiptHtml(p, false);
+
+    var dl = $('download-handout');
+    if (dl) {
+      dl.addEventListener('click', function () {
+        dl.disabled = true;
+        UI.showLoader('Preparing your download...');
+        Api.get('/handouts/link/' + encodeURIComponent(p.reference)).then(
+          function (r) {
+            UI.hideLoader();
+            dl.disabled = false;
+            window.location.href = r.url;
+          },
+          function (err) {
+            UI.hideLoader();
+            dl.disabled = false;
+            UI.toast(err.message, 'error');
+          }
+        );
+      });
+    }
+  }
+
   function renderNotCompleted(p) {
     setTitle('Payment not completed');
     stateEl.innerHTML =
@@ -210,7 +271,7 @@
 
   function handle(result) {
     var p = result.payment;
-    if (result.outcome === 'success') return renderSuccess(p, result.token);
+    if (result.outcome === 'success') return renderSuccess(p, result.token, result.handout);
     stopCountdown();
     if (result.outcome === 'not_completed') return renderNotCompleted(p);
     if (result.outcome === 'flagged') return renderFlagged(p);
