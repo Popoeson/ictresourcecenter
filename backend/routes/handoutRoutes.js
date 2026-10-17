@@ -39,7 +39,17 @@ const initSchema = z.object({
   delivery: z.enum(['pdf', 'pickup']),
 });
 
+const refParams = z.object({
+  reference: z.string().regex(/^[A-Za-z0-9_-]{6,64}$/, 'Invalid reference.'),
+});
+const linkLimiter = makeLimiter({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: 'Too many requests. Please wait a moment and try again.',
+});
+
 router.get('/quote', quoteLimiter, validate(quoteSchema, 'query'), c.quote);
+router.get('/link/:reference', linkLimiter, validate(refParams, 'params'), c.link);
 router.post('/initialize', initLimiter, validate(initSchema), c.initialize);
 
 module.exports = router;
