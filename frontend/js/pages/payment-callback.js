@@ -12,6 +12,8 @@
   var reference = new URLSearchParams(window.location.search).get('reference');
   var retryTimer = null;
   var retries = 0;
+  var countdownTimer = null;
+  var lastPayment = null;
 
   function setTitle(text) { titleEl.textContent = text; }
 
@@ -19,41 +21,162 @@
     return '<div class="detail-row"><dt>' + UI.esc(label) + '</dt><dd>' + UI.esc(value || '-') + '</dd></div>';
   }
 
-  function keepNote() {
-    return '<p class="hint">Keep this page link. You can open it again to see your receipt.</p>';
+  function keepNote(type) {
+    return '<p class="hint">Keep this page link. You can open it again to see your ' +
+      (type === 'assignment' ? 'token or receipt.' : 'receipt.') + '</p>';
+  }
+
+  function retryHref(p) {
+    if (p && p.type === 'assignment') return '/submit-assignment.html';
+    if (!p || p.type === 'ict_fee') return '/pay-fee.html';
+    return '/';
+  }
+
+  function stopCountdown() {
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  }
+
+  /* ---------- Receipt parts shared by the success states ---------- */
+
+  function detailsHtml(p, extraRows) {
+    return '<dl class="detail-list">' +
+      detailRow('Payment for', TYPE_LABEL[p.type] || p.type) +
+      (extraRows || '') +
+      detailRow('Amount', UI.naira(p.amount)) +
+      detailRow('Paid by', p.payerName) +
+      detailRow('Date', UI.fmtDate(p.paidAt)) +
+      detailRow('Receipt number', p.receiptNumber) +
+      detailRow('Reference', p.reference) +
+      '</dl>';
+  }
+
+  function receiptHtml(p, downloadIsPrimary) {
+    return '<div class="qr-block">' +
+        '<img class="qr-img" src="/api/receipts/' + encodeURIComponent(p.reference) + '/qr.png" width="160" height="160" alt="QR code for verifying this receipt">' +
+        '<p class="hint">Show this code to your lecturer to verify your receipt.</p>' +
+      '</div>' +
+      '<a class="btn ' + (downloadIsPrimary ? 'btn-primary' : 'btn-secondary') + ' btn-block" href="/api/receipts/' +
+        encodeURIComponent(p.reference) + '" download>Download receipt</a>' +
+      '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>' +
+      keepNote(p.type);
   }
 
   /* ---------- States ---------- */
 
-  function renderSuccess(p) {
+  function renderSuccess(p, token) {
+    lastPayment = p;
+    if (p.type === 'assignment') return renderAssignment(p, token);
+
     setTitle('Payment received');
     var intro = p.type === 'ict_fee'
       ? UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you. You can download your receipt below.')
       : UI.alertHtml('success', 'Your payment was received.', 'Download your receipt below.');
-    stateEl.innerHTML = intro +
-      '<dl class="detail-list">' +
-        detailRow('Payment for', TYPE_LABEL[p.type] || p.type) +
-        detailRow('Amount', UI.naira(p.amount)) +
-        detailRow('Paid by', p.payerName) +
-        detailRow('Date', UI.fmtDate(p.paidAt)) +
-        detailRow('Receipt number', p.receiptNumber) +
-        detailRow('Reference', p.reference) +
-            '</dl>' +
-      '<div class="qr-block">' +
-        '<img class="qr-img" src="/api/receipts/' + encodeURIComponent(p.reference) + '/qr.png" width="160" height="160" alt="QR code for verifying this receipt">' +
-        '<p class="hint">Show this code to your lecturer to verify your receipt.</p>' +
-      '</div>' +
-      '<a class="btn btn-primary btn-block" href="/api/receipts/' + encodeURIComponent(p.reference) + '" download>Download receipt</a>' +
-      '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>' +
-      keepNote();
+    stateEl.innerHTML = intro + detailsHtml(p) + receiptHtml(p, true);
+  }
+
+  function mmss(total) {
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function payAgainHtml() {
+    return '<a class="btn btn-primary btn-block" href="/submit-assignment.html">Pay again</a>';
+  }
+
+  function startCountdown(seconds) {
+    stopCountdown();
+    var endsAt = Date.now() + seconds * 1000;
+    var said5 = false;
+    var said1 = false;
+
+    function tick() {
+      var box = $('countdown');
+      if (!box) { stopCountdown(); return; }
+      var left = Math.max(0, Math.round((endsAt - Date.now()) / 1000));
+      box.textContent = mmss(left);
+      box.className = 'countdown' + (left <= 60 ? ' countdown-low' : left <= 300 ? ' countdown-warn' : '');
+
+      // Screen readers hear 5 minutes, 1 minute and the end, not every second
+      var live = $('countdown-live');
+      if (live) {
+        if (left <= 300 && !said5 && left > 60) { said5 = true; live.textContent = 'Five minutes left to upload.'; }
+        if (left <= 60 && !said1 && left > 0) { said1 = true; live.textContent = 'One minute left to upload.'; }
+      }
+      if (left <= 0) {
+        stopCountdown();
+        renderAssignment(lastPayment, { status: 'expired' });
+      }
+    }
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
+
+  function copyToken(code) {
+    function done() { UI.toast('Token copied', 'success'); }
+    function fallback() {
+      try {
+        var range = document.createRange();
+        range.selectNodeContents($('token-code'));
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        if (document.execCommand('copy')) { done(); return; }
+      } catch (e) { /* fall through */ }
+      UI.toast('Press and hold the token to copy it.', 'info');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function renderAssignment(p, token) {
+    setTitle('Payment received');
+    stopCountdown();
+
+    var live = !!(token && token.code && token.secondsLeft > 0 && token.status !== 'used' && token.status !== 'revoked');
+    var rows = token && token.filesAllowed ? detailRow('Files paid for', String(token.filesAllowed)) : '';
+
+    if (live) {
+      stateEl.innerHTML =
+        UI.alertHtml('success', 'Your payment was received.', 'Use your token to upload your files.') +
+        '<section class="token-card" aria-label="Your token">' +
+          '<p class="token-label">Your token</p>' +
+          '<p class="token-code" id="token-code">' + UI.esc(token.code) + '</p>' +
+          '<button type="button" class="btn btn-secondary btn-small" id="copy-token">Copy token</button>' +
+          '<p class="token-meta">Time left: <span class="countdown" id="countdown" aria-hidden="true">' + mmss(token.secondsLeft) + '</span></p>' +
+          '<p class="sr-only" id="countdown-live" role="status" aria-live="polite"></p>' +
+          '<p class="hint">You can upload up to ' + UI.esc(token.filesAllowed) + ' file' + (token.filesAllowed === 1 ? '' : 's') +
+            ' (5 MB each). Valid for 30 minutes from payment.</p>' +
+        '</section>' +
+        '<a class="btn btn-primary btn-block" id="continue-upload" href="/upload.html#' + encodeURIComponent(token.code) + '">Continue to upload</a>' +
+        detailsHtml(p, rows) + receiptHtml(p, false);
+      $('copy-token').addEventListener('click', function () { copyToken(token.code); });
+      startCountdown(token.secondsLeft);
+      return;
+    }
+
+    var status = token ? token.status : 'expired';
+    var message;
+    if (status === 'used') {
+      message = UI.alertHtml('info', 'This token has already been used.', 'Your files were submitted. You can still download your receipt below.') +
+        '<a class="btn btn-secondary btn-block" href="/submit-assignment.html">Submit more files</a>';
+    } else if (status === 'revoked') {
+      message = UI.alertHtml('warning', 'This token is no longer valid.', 'Please contact your course lecturer. You can still download your receipt below.');
+    } else {
+      message = UI.alertHtml('warning', 'The time for this token is over.',
+        'Pay again for a new token and a new 30 minutes. You can still download your receipt below.') + payAgainHtml();
+    }
+    stateEl.innerHTML = message + detailsHtml(p, rows) + receiptHtml(p, false);
   }
 
   function renderNotCompleted(p) {
     setTitle('Payment not completed');
-    var retryHref = !p || p.type === 'ict_fee' ? '/pay-fee.html' : '/';
     stateEl.innerHTML =
       UI.alertHtml('info', 'Payment was not completed.', 'You have not been charged.') +
-      '<a class="btn btn-primary btn-block" href="' + retryHref + '">Try again</a>' +
+      '<a class="btn btn-primary btn-block" href="' + retryHref(p) + '">Try again</a>' +
       '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>';
   }
 
@@ -87,7 +210,8 @@
 
   function handle(result) {
     var p = result.payment;
-    if (result.outcome === 'success') return renderSuccess(p);
+    if (result.outcome === 'success') return renderSuccess(p, result.token);
+    stopCountdown();
     if (result.outcome === 'not_completed') return renderNotCompleted(p);
     if (result.outcome === 'flagged') return renderFlagged(p);
     scheduleRetry();
