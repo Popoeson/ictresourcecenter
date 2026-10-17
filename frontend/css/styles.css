@@ -547,6 +547,20 @@ a { color: var(--text); }
 .token-panel .name-results { margin-bottom: 16px; }
 .token-panel .chosen-card { margin-bottom: 24px; }
 
+/* ---------- Buy handout ---------- */
+.choice-set { border: 0; padding: 0; margin: 0 0 24px; }
+.choice-set legend { padding: 0; margin-bottom: 8px; font-weight: 500; }
+.choice {
+  display: flex; align-items: center; gap: 12px; min-height: 48px; margin-bottom: 8px;
+  padding: 12px 16px; background: #fff; border: 1px solid var(--border); border-radius: 16px; cursor: pointer;
+}
+.choice:hover { border-color: var(--accent); background: var(--accent-soft); }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.choice input { flex-shrink: 0; width: 20px; height: 20px; margin: 0; accent-color: var(--text); }
+.choice-title { display: block; font-weight: 500; }
+.choice-text { display: block; font-size: 14px; color: var(--text-muted); }
+#delivery-note { margin: 0 0 16px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
