@@ -24,7 +24,7 @@ const submissionRoutes = require('./routes/submissionRoutes');
 const tokenAdminRoutes = require('./routes/tokenAdminRoutes');
 const handoutAdminRoutes = require('./routes/handoutAdminRoutes');
 const handoutRoutes = require('./routes/handoutRoutes');
-
+const handoutOrderAdminRoutes = require('./routes/handoutOrderAdminRoutes');
 const app = express();
 
 app.set('trust proxy', env.trustProxyHops);
@@ -56,6 +56,7 @@ app.use('/api/admin/admins', adminRoutes);
 app.use('/api/admin/payments', paymentAdminRoutes);
 app.use('/api/admin/tokens', tokenAdminRoutes);
 app.use('/api/admin/handouts', handoutAdminRoutes);
+app.use('/api/admin/handout-orders', handoutOrderAdminRoutes);
 
 // Keep this one after the other /api/admin routers: it applies login protection to everything under /api/admin
 
