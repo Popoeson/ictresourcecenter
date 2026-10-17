@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tokens | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading shell-heading-row">
+      <div>
+        <h1>Tokens</h1>
+        <p class="muted">Upload tokens for assignments. Reissue an unused token or create one by hand.</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="new-token-btn">Create token</button>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <!-- Result of a create or reissue -->
+    <div class="card token-panel hidden" id="result-card" aria-live="polite">
+      <h2 id="result-title" tabindex="-1">Token ready</h2>
+      <div class="token-card">
+        <p class="token-label" id="result-for"></p>
+        <p class="token-code" id="result-code"></p>
+        <button type="button" class="btn btn-secondary" id="result-copy">Copy token</button>
+        <p class="token-meta" id="result-meta"></p>
+      </div>
+      <p class="hint" id="result-note"></p>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="result-done">Done</button>
+      </div>
+    </div>
+
+    <!-- Reissue confirmation -->
+    <div class="card token-panel hidden" id="reissue-card" role="group" aria-labelledby="reissue-title">
+      <h2 id="reissue-title" tabindex="-1"></h2>
+      <p id="reissue-text"></p>
+      <div id="r-alert" aria-live="polite"></div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="reissue-yes">Reissue token</button>
+        <button type="button" class="btn btn-secondary" id="reissue-no">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Create a token by hand -->
+    <div class="card token-panel hidden" id="create-card">
+      <h2 id="create-title" tabindex="-1">Create a token</h2>
+      <p class="muted">For a student who needs a token without paying. Only you can see tokens made this way.</p>
+      <div id="c-alert" aria-live="polite"></div>
+
+      <div class="field">
+        <label for="c-inst">Institution</label>
+        <select class="select" id="c-inst"></select>
+      </div>
+      <div class="field">
+        <label for="c-level">Level</label>
+        <select class="select" id="c-level" disabled></select>
+      </div>
+
+      <div id="c-search-block">
+        <div class="field">
+          <label for="c-q">Student name</label>
+          <input class="input" id="c-q" type="search" autocomplete="off" disabled>
+          <p class="hint" id="c-hint">Type at least 3 letters of the name.</p>
+        </div>
+        <ul class="name-results hidden" id="c-results"></ul>
+      </div>
+
+      <div class="chosen-card hidden" id="c-chosen">
+        <div>
+          <div><strong id="c-chosen-name"></strong></div>
+          <div class="hint" id="c-chosen-dept"></div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" id="c-change">Change</button>
+      </div>
+
+      <div class="field">
+        <label for="c-files">Number of files</label>
+        <select class="select" id="c-files">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="c-create" disabled>Create token</button>
+        <button type="button" class="btn btn-secondary" id="c-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-q">Search</label>
+        <input class="input" id="f-q" type="search" placeholder="Token or student name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-status">Status</label>
+        <select class="select" id="f-status">
+          <option value="">All</option>
+          <option value="active">Active</option>
+          <option value="in_progress">In use</option>
+          <option value="used">Used</option>
+          <option value="expired">Expired</option>
+          <option value="revoked">Replaced</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-source">Made by</label>
+        <select class="select" id="f-source">
+          <option value="">All</option>
+          <option value="payment">Payment</option>
+          <option value="reissue">Reissued</option>
+          <option value="manual">Manual</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-from">From</label>
+        <input class="input" id="f-from" type="date">
+      </div>
+      <div class="field">
+        <label for="f-to">To</label>
+        <input class="input" id="f-to" type="date">
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="tokens-count" aria-live="polite"></p>
+
+    <div id="tokens-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="tokens-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th>Student</th>
+            <th>Token</th>
+            <th>Made by</th>
+            <th>Files</th>
+            <th>Status</th>
+            <th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="tokens-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/tokens.js"></script>
+</body>
+</html>
