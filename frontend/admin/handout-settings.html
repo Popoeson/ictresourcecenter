@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Handout settings | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Handout settings</h1>
+      <p class="muted">Choose how handouts are delivered and upload the PDF for each level.</p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <section class="card token-panel">
+      <h2>Delivery mode</h2>
+      <p class="muted">This applies to every institution.</p>
+      <div id="mode-alert" aria-live="polite"></div>
+      <div class="field">
+        <label for="mode">How buyers get the handout</label>
+        <select class="select" id="mode">
+          <option value="pdf">PDF download only</option>
+          <option value="pickup">Pickup only (hard copy)</option>
+          <option value="hybrid">Hybrid (the buyer chooses)</option>
+        </select>
+        <p class="hint">With PDF only, buyers cannot buy for a level that has no PDF yet.</p>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="mode-save" disabled>Save delivery mode</button>
+      </div>
+    </section>
+
+    <!-- Upload or replace a PDF -->
+    <section class="card token-panel hidden" id="up-card" role="group" aria-labelledby="up-title">
+      <h2 id="up-title" tabindex="-1">Upload handout PDF</h2>
+      <p id="up-target"></p>
+      <p class="hint" id="up-note"></p>
+      <div id="up-alert" aria-live="polite"></div>
+      <label class="dropzone" id="dropzone" for="up-file">
+        <p class="dropzone-title">Choose a PDF</p>
+        <p class="hint">or drop it here. PDF only, up to 10 MB.</p>
+        <input class="sr-only" type="file" id="up-file" accept=".pdf,application/pdf">
+      </label>
+      <div class="file-chip hidden" id="up-chip">
+        <div>
+          <div class="file-chip-name" id="up-name"></div>
+          <div class="hint" id="up-size"></div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" id="up-remove">Remove</button>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="up-btn" disabled>Upload PDF</button>
+        <button type="button" class="btn btn-secondary" id="up-cancel">Cancel</button>
+      </div>
+    </section>
+
+    <h2>Handout PDFs</h2>
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-inst">Institution</label>
+        <select class="select" id="f-inst"></select>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select class="select" id="f-dept" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-status">PDF</label>
+        <select class="select" id="f-status">
+          <option value="">All</option>
+          <option value="uploaded">Uploaded</option>
+          <option value="missing">Missing</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="files-summary" aria-live="polite"></p>
+    <p class="hint" id="files-count" aria-live="polite"></p>
+
+    <div id="files-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="files-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Institution</th>
+            <th>Department</th>
+            <th>Level</th>
+            <th>PDF</th>
+            <th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="files-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/handout-settings.js"></script>
+</body>
+</html>
