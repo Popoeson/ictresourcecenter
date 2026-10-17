@@ -21,6 +21,7 @@ const receiptRoutes = require('./routes/receiptRoutes');
 const paymentAdminRoutes = require('./routes/paymentAdminRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
+const tokenAdminRoutes = require('./routes/tokenAdminRoutes');
 
 const app = express();
 
@@ -51,7 +52,10 @@ app.use('/api/admin/students', studentRoutes);
 app.use('/api/admin/import', importRoutes);
 app.use('/api/admin/admins', adminRoutes);
 app.use('/api/admin/payments', paymentAdminRoutes);
+app.use('/api/admin/tokens', tokenAdminRoutes);
+
 // Keep this one after the other /api/admin routers: it applies login protection to everything under /api/admin
+
 app.use('/api/admin', structureRoutes);
 app.use('/api/lookups', lookupRoutes);
 app.use('/api/students', studentSearchRoutes);
