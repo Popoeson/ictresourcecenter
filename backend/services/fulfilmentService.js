@@ -4,6 +4,7 @@ const { AppError } = require('../middleware/errorHandler');
 const logger = require('../config/logger');
 const paystack = require('./paystackProvider');
 const tokenService = require('./tokenService');
+const handoutOrderService = require('./handoutOrderService');
 
 // The callback page, the webhook and the Super Admin "re-verify" all use this file,
 // so a payment is fulfilled exactly once whichever path gets there first.
@@ -81,7 +82,15 @@ async function fulfilPayment(reference, via, ps) {
       logger.error({ reference, err: err.message }, 'Token creation failed after payment');
     }
   }
-  // The handout action is added in phase 6.
+  
+if (won.type === 'handout') {
+    // If this fails, the payment stays successful and the order is created when the callback page is next opened.
+    try {
+      await handoutOrderService.createOrder(won);
+    } catch (err) {
+      logger.error({ reference, err: err.message }, 'Handout order creation failed after payment');
+    }
+  }
 
   logger.info({ reference, via, type: won.type }, 'Payment fulfilled');
   return Payment.findById(won._id);
@@ -169,6 +178,13 @@ async function verifyAndFulfil(reference, via) {
   const result = await verifyCore(reference, via);
   if (result.outcome === 'success' && result.payment.type === 'assignment') {
     result.token = await tokenInfo(reference);
+  } else if (result.outcome === 'success' && result.payment.type === 'handout') {
+    try {
+      result.handout = await handoutOrderService.handoutInfo(reference);
+    } catch (err) {
+      logger.error({ reference, err: err.message }, 'Could not load the handout order');
+      result.handout = null;
+    }
   }
   return result;
 }
