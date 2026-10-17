@@ -130,4 +130,17 @@ async function destroy(publicId, resourceType) {
   }
 }
 
-module.exports = { validateFile, uploadBuffer, destroy, assignmentFolder, handoutFolder, extensionOf, RULES };
+// A short-lived link to download a private file. A new link is made on every request.
+function signedDownloadUrl({ publicId, resourceType, format, ttlSeconds }) {
+  const c = client();
+  const expiresAt = Math.floor(Date.now() / 1000) + (ttlSeconds || 300);
+  // Non-image files keep their extension inside the public id, so no format is passed for them
+  return c.utils.private_download_url(publicId, resourceType === 'raw' ? '' : format || '', {
+    resource_type: resourceType,
+    type: 'authenticated',
+    expires_at: expiresAt,
+    attachment: true,
+  });
+}
+
+module.exports = { validateFile, uploadBuffer, destroy, assignmentFolder, handoutFolder, signedDownloadUrl, extensionOf, RULES };
