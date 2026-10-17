@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buy the course handout | ICT Course Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="/">ICT Course Portal</a>
+      <a class="header-link" href="/admin/login.html">Admin</a>
+    </header>
+
+    <div class="sheet-page sheet-narrow">
+      <main>
+        <a class="back-link" href="/">&lsaquo; Back</a>
+        <h1 class="page-title">Buy the course handout</h1>
+        <p class="lead">Get the handout as a PDF or a hard copy. You do not need to be on the student list.</p>
+
+        <div id="page-alert" aria-live="polite"></div>
+
+        <div class="field">
+          <label for="f-name">Full name</label>
+          <input class="input" id="f-name" type="text" autocomplete="name" maxlength="120" aria-describedby="e-name">
+          <p class="field-error hidden" id="e-name"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-phone">Phone number</label>
+          <input class="input" id="f-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="25" placeholder="08012345678" aria-describedby="e-phone">
+          <p class="field-error hidden" id="e-phone"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input class="input" id="f-email" type="email" inputmode="email" autocomplete="email" maxlength="200" aria-describedby="e-email">
+          <p class="field-error hidden" id="e-email"></p>
+        </div>
+
+        <div class="field">
+          <label for="f-inst">Institution</label>
+          <select class="select" id="f-inst"></select>
+        </div>
+
+        <div class="field hidden" id="dept-field">
+          <label for="f-dept">Department</label>
+          <select class="select" id="f-dept"></select>
+        </div>
+
+        <div class="field hidden" id="level-field">
+          <label for="f-level">Level</label>
+          <select class="select" id="f-level"></select>
+        </div>
+
+        <section class="fee-card hidden" id="fee-card" aria-labelledby="fee-title">
+          <p class="fee-label" id="fee-title">Course handout</p>
+          <p class="fee-amount" id="fee-amount"></p>
+          <p class="hint" id="fee-for"></p>
+          <p class="hint">Paid securely through Paystack.</p>
+        </section>
+
+        <fieldset class="choice-set hidden" id="delivery-field">
+          <legend>How would you like to get it?</legend>
+          <label class="choice hidden" id="choice-pdf">
+            <input type="radio" name="delivery" value="pdf">
+            <span><span class="choice-title">PDF download</span><span class="choice-text">Download it right after paying.</span></span>
+          </label>
+          <label class="choice hidden" id="choice-pickup">
+            <input type="radio" name="delivery" value="pickup">
+            <span><span class="choice-title">Pick up a hard copy</span><span class="choice-text">You get a code to show when you collect it.</span></span>
+          </label>
+        </fieldset>
+        <p class="hint hidden" id="delivery-note"></p>
+
+        <button type="button" class="btn btn-primary btn-block hidden" id="pay-btn"></button>
+      </main>
+    </div>
+
+    <footer class="site-footer-line">
+      <p>Need help? Contact your course lecturer. &copy; <span id="year"></span></p>
+    </footer>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/pages/buy-handout.js"></script>
+</body>
+</html>
