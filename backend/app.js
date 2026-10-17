@@ -23,6 +23,7 @@ const webhookRoutes = require('./routes/webhookRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const tokenAdminRoutes = require('./routes/tokenAdminRoutes');
 const handoutAdminRoutes = require('./routes/handoutAdminRoutes');
+const handoutRoutes = require('./routes/handoutRoutes');
 
 const app = express();
 
@@ -54,7 +55,8 @@ app.use('/api/admin/import', importRoutes);
 app.use('/api/admin/admins', adminRoutes);
 app.use('/api/admin/payments', paymentAdminRoutes);
 app.use('/api/admin/tokens', tokenAdminRoutes);
-app.use('/api/admin/handouts', handoutAdminRoutes);
+app.use('/api/pricing', pricingRoutes);
+app.use('/api/handouts', handoutRoutes);
 
 // Keep this one after the other /api/admin routers: it applies login protection to everything under /api/admin
 
