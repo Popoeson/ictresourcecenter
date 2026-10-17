@@ -541,6 +541,12 @@ a { color: var(--text); }
 .file-chip-info > span { display: block; }
 #confirm-box .btn-row { margin-top: 8px; }
 
+/* ---------- Tokens admin page ---------- */
+.token-panel { margin-bottom: 24px; }
+.token-panel .btn-row { margin-top: 16px; }
+.token-panel .name-results { margin-bottom: 16px; }
+.token-panel .chosen-card { margin-bottom: 24px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
