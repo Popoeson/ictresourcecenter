@@ -27,6 +27,7 @@
     count: $('subs-count'), empty: $('subs-empty'), wrap: $('subs-wrap'), body: $('subs-body'),
     pager: $('pager'), prev: $('pager-prev'), next: $('pager-next'), info: $('pager-info'),
     zipSel: $('zip-selected'), zipAll: $('zip-all'), checkAll: $('check-all')
+  };
 
   function showAlert(type, title, text) { alertEl.innerHTML = UI.alertHtml(type, title, text); }
   function clearAlert() { alertEl.innerHTML = ''; }
@@ -111,8 +112,8 @@
     if (!data.items.length) {
       el.count.textContent = '';
       showEmpty(filtersActive() ? 'No submissions yet for this filter.' : 'No submissions yet.');
-      updateSelection();showEmpty(filtersActive() ? 'No submissions yet for this filter.' : 'No submissions yet.');
       updateSelection();
+      return;
     }
 
     el.empty.classList.add('hidden');
@@ -262,6 +263,7 @@
   });
 
   /* ---------- Delete (Super Admin) ---------- */
+
   el.body.addEventListener('click', function (e) {
     var btn = e.target.closest('button[data-act="delete"]');
     if (!btn) return;
