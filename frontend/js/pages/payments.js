@@ -248,8 +248,37 @@
     if (btn) reverify(btn);
   });
 
-  /* ---------- Start ---------- */
+  /* ---------- Export ---------- */
 
+  $('export-btn').addEventListener('click', function () {
+    if (el.from.value && el.to.value && el.from.value > el.to.value) {
+      showAlert('warning', 'The "From" date is after the "To" date.', 'Change one of them.');
+      return;
+    }
+    var btn = $('export-btn');
+    clearAlert();
+    btn.disabled = true;
+    UI.showLoader('Preparing your download...');
+    Api.download('/admin/export/payments', {
+      q: el.q.value.trim(),
+      type: el.type.value,
+      status: el.status.value,
+      institution: el.inst.value,
+      department: el.dept.value,
+      level: el.level.value,
+      from: el.from.value,
+      to: el.to.value
+    }).then(
+      function () { UI.hideLoader(); btn.disabled = false; UI.toast('Export downloaded', 'success'); },
+      function (err) {
+        UI.hideLoader();
+        btn.disabled = false;
+        showAlert(err.status === 400 || err.status === 404 ? 'warning' : 'error', err.message, '');
+      }
+    );
+  });
+
+  /* ---------- Start ---------- */
   Auth.init({ page: 'payments' }).then(function (admin) {
     isSuper = admin.role === 'superadmin';
         el.stats.classList.remove('hidden');
