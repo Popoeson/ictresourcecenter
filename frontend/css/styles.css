@@ -565,6 +565,27 @@ a { color: var(--text); }
 .col-check { width: 48px; }
 .row-check, #check-all { width: 24px; height: 24px; accent-color: var(--text); cursor: pointer; }
 
+/* ---------- Reports ---------- */
+.report-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; }
+.report-tab {
+  flex-shrink: 0; min-height: 48px; padding: 0 16px; font: inherit; color: var(--text);
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-control); cursor: pointer;
+}
+.report-tab:hover { border-color: var(--accent); }
+.report-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); font-weight: 500; }
+.chart-card { margin-bottom: 24px; }
+.chart-card h2 { margin-bottom: 4px; }
+.chart-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; margin-top: 16px; }
+.chart-value { font-weight: 500; }
+.chart-bar {
+  grid-column: 1 / -1; width: 100%; height: 12px; border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden; background: var(--accent-soft);
+  -webkit-appearance: none; appearance: none;
+}
+.chart-bar::-webkit-progress-bar { background: var(--accent-soft); }
+.chart-bar::-webkit-progress-value { background: var(--accent-hover); }
+.chart-bar::-moz-progress-bar { background: var(--accent-hover); }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
