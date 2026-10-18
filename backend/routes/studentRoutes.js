@@ -49,10 +49,11 @@ const updateSchema = z
 
 router.use(protect);
 
-// Admins and Super Admins may read. Only the Super Admin may write.
+// Admins and Super Admins may read and add students. Only the Super Admin may edit or delete.
+
 router.get('/', validate(listQuery, 'query'), c.listStudents);
 router.get('/:id', validate(idParams, 'params'), c.getStudent);
-router.post('/', superOnly, validate(createSchema), c.createStudent);
+router.post('/', validate(createSchema), c.createStudent);
 router.patch('/:id', superOnly, validate(idParams, 'params'), validate(updateSchema), c.updateStudent);
 router.delete('/:id', superOnly, validate(idParams, 'params'), c.deleteStudent);
 
