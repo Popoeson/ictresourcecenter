@@ -1,9 +1,10 @@
-const { Institution, Level, Price } = require('../models');
+const { Institution, Department, Level, Price } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { normKey } = require('../services/normalize');
 const auditService = require('../services/auditService');
 
-const FIELDS = ['ictFee', 'handoutPrice'];
+const FIELDS = ['ictFee', 'handoutPrice', 'departmentalFee'];
+const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science');
 
 function send(res, data, status = 200) {
   res.status(status).json({ success: true, data });
@@ -20,6 +21,15 @@ async function listPrices(req, res, next) {
     const prices = await Price.find({ institution: { $in: ids } });
     const priceMap = new Map(prices.map((p) => [`${p.institution}:${p.levelKey}`, p]));
 
+    // The departmental fee only applies where there is a Computer Science department
+    const csDepartments = await Department.find({
+      institution: { $in: ids },
+      nameKey: DEPARTMENTAL_DEPARTMENT_KEY,
+    })
+      .select('institution')
+      .lean();
+    const hasCs = new Set(csDepartments.map((d) => String(d.institution)));
+
     const result = institutions.map((inst) => {
       const seen = new Set();
       const rows = [];
@@ -33,10 +43,12 @@ async function listPrices(req, res, next) {
           levelLabel: l.name,
           ictFee: p ? p.ictFee : null,
           handoutPrice: p ? p.handoutPrice : null,
+          departmentalFee: p ? p.departmentalFee : null,
         });
       }
       return {
         institution: { id: inst._id, name: inst.name, isActive: inst.isActive },
+        hasComputerScience: hasCs.has(String(inst._id)),
         levels: rows,
       };
     });
