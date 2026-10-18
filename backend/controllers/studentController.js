@@ -158,4 +158,4 @@ async function deleteStudent(req, res, next) {
   }
 }
 
-module.exports = { listStudents, getStudent, createStudent, updateStudent, deleteStudent };
+module.exports = { listStudents, getStudent, createStudent, updateStudent, deleteStudent, buildFilter };
