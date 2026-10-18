@@ -241,8 +241,38 @@
     });
   });
 
-  /* ---------- Start ---------- */
+  /* ---------- Export ---------- */
 
+  $('export-btn').addEventListener('click', function () {
+    if (el.from.value && el.to.value && el.from.value > el.to.value) {
+      showAlert('warning', 'The "From" date is after the "To" date.', 'Change one of them.');
+      return;
+    }
+    var btn = $('export-btn');
+    clearAlert();
+    btn.disabled = true;
+    UI.showLoader('Preparing your download...');
+    Api.download('/admin/export/handout-orders', {
+      q: el.q.value.trim(),
+      delivery: el.delivery.value,
+      buyer: el.buyer.value,
+      pickup: el.pickup.value,
+      institution: el.inst.value,
+      department: el.dept.value,
+      level: el.level.value,
+      from: el.from.value,
+      to: el.to.value
+    }).then(
+      function () { UI.hideLoader(); btn.disabled = false; UI.toast('Export downloaded', 'success'); },
+      function (err) {
+        UI.hideLoader();
+        btn.disabled = false;
+        showAlert(err.status === 400 || err.status === 404 ? 'warning' : 'error', err.message, '');
+      }
+    );
+  });
+
+  /* ---------- Start ---------- */
   Auth.init({ page: 'handouts' }).then(function () {
     UI.fillSelect(el.inst, [], { placeholder: 'All institutions' });
     Api.get('/lookups/institutions').then(function (list) {
