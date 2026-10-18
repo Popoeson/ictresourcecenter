@@ -19,6 +19,7 @@ const priceSchema = new mongoose.Schema(
     levelLabel: { type: String, trim: true },
     ictFee: koboField,
     handoutPrice: koboField,
+    departmentalFee: koboField,
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', default: null },
   },
   { timestamps: true }
