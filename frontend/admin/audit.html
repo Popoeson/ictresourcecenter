@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Audit log | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Audit log</h1>
+      <p class="muted">Who changed what, and when. This list cannot be edited.</p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="filter-bar">
+      <div class="field">
+        <label for="f-actor">Person</label>
+        <select class="select" id="f-actor"></select>
+      </div>
+      <div class="field">
+        <label for="f-action">Action</label>
+        <select class="select" id="f-action"></select>
+      </div>
+      <div class="field">
+        <label for="f-from">From</label>
+        <input class="input" id="f-from" type="date">
+      </div>
+      <div class="field">
+        <label for="f-to">To</label>
+        <input class="input" id="f-to" type="date">
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+    </div>
+    <p class="hint" id="audit-count" aria-live="polite"></p>
+
+    <div id="audit-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="audit-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Who</th>
+            <th>What</th>
+            <th>About</th>
+            <th><span class="sr-only">Details</span></th>
+          </tr>
+        </thead>
+        <tbody id="audit-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/audit.js"></script>
+</body>
+</html>
