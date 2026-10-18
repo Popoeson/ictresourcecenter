@@ -5,7 +5,7 @@ const { ObjectId } = mongoose.Schema.Types;
 const paymentSchema = new mongoose.Schema(
   {
     reference: { type: String, required: true, unique: true },
-    type: { type: String, enum: ['ict_fee', 'assignment', 'handout'], required: true },
+        type: { type: String, enum: ['ict_fee', 'assignment', 'handout', 'departmental_fee'], required: true },
     status: {
       type: String,
       enum: ['pending', 'success', 'failed', 'abandoned', 'flagged'],
@@ -47,12 +47,18 @@ const paymentSchema = new mongoose.Schema(
 );
 
 // One successful ICT fee per student, even under simultaneous requests
+
 paymentSchema.index(
   { student: 1, type: 1 },
   { unique: true, partialFilterExpression: { type: 'ict_fee', status: 'success' } }
 );
 paymentSchema.index({ type: 1, status: 1, createdAt: -1 });
-paymentSchema.index({ institution: 1, createdAt: -1 });
+// One successful departmental fee per student. The key order differs from the ICT fee index on purpose.
+paymentSchema.index(
+  { type: 1, student: 1 },
+  { unique: true, partialFilterExpression: { type: 'departmental_fee', status: 'success' } }
+);
+paymentSchema.index({ type: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ student: 1 });
 
 module.exports = mongoose.model('Payment', paymentSchema, 'payments');
