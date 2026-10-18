@@ -49,6 +49,10 @@
       <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
     </div>
     <p class="hint" id="subs-count" aria-live="polite"></p>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="zip-selected" disabled>Download selected as ZIP</button>
+      <button type="button" class="btn btn-secondary btn-small" id="zip-all" disabled>Download all matching as ZIP</button>
+    </div>
 
     <div id="subs-empty" class="card hidden"></div>
 
@@ -56,6 +60,7 @@
       <table class="table responsive students-table">
         <thead>
           <tr>
+            <th class="col-check"><input type="checkbox" id="check-all" aria-label="Select all on this page"></th>
             <th>Uploaded</th>
             <th>Student</th>
             <th>Class</th>
