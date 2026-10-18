@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const axios = require('axios');
+const archiver = require('archiver');
+
 const { Submission, Student } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const auditService = require('../services/auditService');
@@ -179,4 +181,154 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { list, download, remove };
+/* ---------- Bulk ZIP ---------- */
+
+const MAX_ZIP_FILES = 100;
+
+// Either a list of selected ids, or the same filters as the list
+async function zipFilter(q) {
+  const raw = q.ids ? String(q.ids).split(',').map((s) => s.trim()).filter(Boolean) : [];
+  if (raw.length) {
+    if (raw.length > MAX_ZIP_FILES) {
+      throw new AppError('Select ' + MAX_ZIP_FILES + ' files or fewer.', 400, 'ZIP_TOO_LARGE');
+    }
+    if (raw.some((id) => !ID_RX.test(id))) throw new AppError('Invalid selection.', 400, 'VALIDATION');
+    return { _id: { $in: raw.map((id) => new mongoose.Types.ObjectId(id)) }, isDeleted: false };
+  }
+  return buildFilter(q);
+}
+
+// Lets the page show a message before the download starts
+async function zipCheck(req, res, next) {
+  try {
+    const count = await Submission.countDocuments(await zipFilter(req.query));
+    send(res, { count, max: MAX_ZIP_FILES, tooMany: count > MAX_ZIP_FILES });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Institution/Level/Student - original name, with (2), (3)... for repeated names
+function zipPath(s, used) {
+  const f = s.file || {};
+  const inst = safeName(s.institution && s.institution.name).slice(0, 60) || 'Institution';
+  const lvl = safeName(s.level && s.level.name).slice(0, 60) || 'Level';
+  const who = safeName(studentName(s.student)).slice(0, 60);
+  let original = safeName(f.originalName) || 'file' + (f.extension ? '.' + f.extension : '');
+  if (original.length > 90) original = original.slice(-90);
+  const base = (who ? who + ' - ' : '') + original;
+  const dir = inst + '/' + lvl;
+
+  let path = dir + '/' + base;
+  let n = 2;
+  while (used.has(path.toLowerCase())) {
+    const dot = base.lastIndexOf('.');
+    const stem = dot > 0 ? base.slice(0, dot) : base;
+    const ext = dot > 0 ? base.slice(dot) : '';
+    path = dir + '/' + stem + ' (' + n + ')' + ext;
+    n += 1;
+  }
+  used.add(path.toLowerCase());
+  return path;
+}
+
+// Resolves when the archive has finished adding the entry (or has failed)
+function waitEntry(archive) {
+  return new Promise((resolve) => {
+    const finish = () => {
+      archive.removeListener('entry', finish);
+      archive.removeListener('error', finish);
+      resolve();
+    };
+    archive.once('entry', finish);
+    archive.once('error', finish);
+  });
+}
+
+// Streams a ZIP, one file at a time, so memory stays small on the free plan
+async function zip(req, res, next) {
+  try {
+    const filter = await zipFilter(req.query);
+    const docs = await Submission.find(filter)
+      .populate(POPULATE)
+      .sort({ uploadedAt: 1, _id: 1 })
+      .limit(MAX_ZIP_FILES + 1);
+
+    if (!docs.length) throw new AppError('There are no files to download for this filter.', 404, 'NO_FILES');
+    if (docs.length > MAX_ZIP_FILES) {
+      throw new AppError('More than ' + MAX_ZIP_FILES + ' files match. Narrow the filter and try again.', 400, 'ZIP_TOO_LARGE');
+    }
+
+    const archive = archiver('zip', { store: true });
+    let aborted = false;
+    let current = null;
+
+    res.on('close', () => {
+      if (!res.writableFinished) {
+        aborted = true;
+        archive.abort();
+        if (current) current.destroy();
+      }
+    });
+    archive.on('error', (err) => {
+      logger.error({ err: err.message }, 'ZIP failed');
+      res.destroy();
+    });
+    archive.on('warning', (err) => logger.warn({ err: err.message }, 'ZIP warning'));
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', disposition('submissions-' + new Date().toISOString().slice(0, 10) + '.zip'));
+    res.setHeader('Cache-Control', 'no-store');
+    archive.pipe(res);
+
+    const used = new Set();
+    const missing = [];
+
+    for (const s of docs) {
+      if (aborted) return;
+      const f = s.file;
+      const name = zipPath(s, used);
+
+      let upstream;
+      try {
+        const url = fileService.signedDownloadUrl({
+          publicId: f.publicId,
+          resourceType: f.resourceType,
+          format: f.format || f.extension,
+          ttlSeconds: 300,
+        });
+        upstream = await axios.get(url, { responseType: 'stream', timeout: 30000 });
+      } catch (err) {
+        if (err.response && err.response.data && typeof err.response.data.destroy === 'function') {
+          err.response.data.destroy();
+        }
+        logger.warn({ id: String(s._id) }, 'File could not be added to the ZIP');
+        missing.push(name);
+        continue;
+      }
+
+      current = upstream.data;
+      const added = waitEntry(archive);
+      archive.append(upstream.data, { name });
+      await added;
+      current = null;
+    }
+
+    if (aborted) return;
+    if (missing.length) {
+      archive.append(
+        'These files could not be fetched and are not in this ZIP:\r\n\r\n' + missing.join('\r\n') + '\r\n',
+        { name: 'NOT INCLUDED.txt' }
+      );
+    }
+    await archive.finalize();
+  } catch (err) {
+    if (res.headersSent) {
+      res.destroy();
+      return;
+    }
+    next(err);
+  }
+}
+
+module.exports = { list, download, remove, zipCheck, zip };
