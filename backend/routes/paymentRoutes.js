@@ -18,7 +18,7 @@ const verifyLimiter = makeLimiter({
 });
 
 const initSchema = z.object({
-  type: z.enum(['ict_fee', 'assignment', 'handout']),
+    type: z.enum(['ict_fee', 'assignment', 'handout', 'departmental_fee']),
   studentId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid student.'),
   files: z.number().int().min(1).max(100).optional(),
 });
