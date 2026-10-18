@@ -1,13 +1,19 @@
 const crypto = require('crypto');
-const { Payment, Student, Price, Level, Setting } = require('../models');
+const { Payment, Student, Price, Level, Setting, Department } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { env } = require('../config/env');
+const { normKey } = require('./normalize');
 const paystack = require('./paystackProvider');
 
 // Paystack needs an email. Students who only gave a phone number get a placeholder.
 const NO_EMAIL_DOMAIN = 'noemail.example.com';
 const REF_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const DEFAULT_MAX_FILES = 10;
+
+// The departmental fee is only for students in a department with this name, in any institution
+const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science');
+
+const PAYABLE_TYPES = ['ict_fee', 'assignment', 'departmental_fee'];
 
 function generateReference() {
   let s = '';
@@ -51,6 +57,43 @@ async function quoteIctFee(studentId) {
   return { alreadyPaid: false, amount: await feeAmountFor(student), currency: 'NGN' };
 }
 
+/* ---------- Departmental fee ---------- */
+
+// Only Computer Science students pay it
+async function ensureDepartmentalEligible(student) {
+  const dept = await Department.findById(student.department).select('nameKey');
+  if (!dept || dept.nameKey !== DEPARTMENTAL_DEPARTMENT_KEY) {
+    throw new AppError('The departmental fee is only for Computer Science students.', 403, 'NOT_ELIGIBLE');
+  }
+}
+
+// The departmental fee comes from the price row for the student's institution and level name.
+async function departmentalFeeAmountFor(student) {
+  await ensureDepartmentalEligible(student);
+  if (await Payment.exists({ student: student._id, type: 'departmental_fee', status: 'success' })) {
+    throw new AppError('Your departmental fee has already been paid.', 409, 'ALREADY_PAID');
+  }
+  const price = await Price.findOne({ institution: student.institution, levelKey: student.levelKey });
+  if (!price || !Number.isInteger(price.departmentalFee) || price.departmentalFee <= 0) {
+    throw new AppError(
+      'The departmental fee has not been set yet. Please contact your course lecturer.',
+      400,
+      'PRICE_NOT_SET'
+    );
+  }
+  return price.departmentalFee;
+}
+
+async function quoteDepartmentalFee(studentId) {
+  const student = await loadStudent(studentId);
+  await ensureDepartmentalEligible(student);
+  const paid = await Payment.findOne({ student: student._id, type: 'departmental_fee', status: 'success' }).select(
+    'reference'
+  );
+  if (paid) return { alreadyPaid: true, reference: paid.reference };
+  return { alreadyPaid: false, amount: await departmentalFeeAmountFor(student), currency: 'NGN' };
+}
+
 /* ---------- Assignment ---------- */
 
 async function maxFilesPerPurchase() {
@@ -87,13 +130,14 @@ async function quoteAssignment(studentId, files) {
 
 async function quote({ type, studentId, files }) {
   if (type === 'ict_fee') return quoteIctFee(studentId);
+  if (type === 'departmental_fee') return quoteDepartmentalFee(studentId);
   if (type === 'assignment') return quoteAssignment(studentId, files);
   throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
 }
 
 // Creates the pending payment and returns the Paystack link. The amount is always calculated here.
 async function initializePayment({ type, studentId, files }) {
-  if (type !== 'ict_fee' && type !== 'assignment') {
+  if (!PAYABLE_TYPES.includes(type)) {
     throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
   }
 
@@ -102,6 +146,8 @@ async function initializePayment({ type, studentId, files }) {
   let details;
   if (type === 'ict_fee') {
     amount = await feeAmountFor(student);
+  } else if (type === 'departmental_fee') {
+    amount = await departmentalFeeAmountFor(student);
   } else {
     const { count } = await checkFileCount(files);
     const pricePerFile = await assignmentPriceFor(student);
@@ -146,4 +192,12 @@ async function initializePayment({ type, studentId, files }) {
   }
 }
 
-module.exports = { initializePayment, quote, quoteIctFee, quoteAssignment, generateReference, callbackUrlFor };
+module.exports = {
+  initializePayment,
+  quote,
+  quoteIctFee,
+  quoteDepartmentalFee,
+  quoteAssignment,
+  generateReference,
+  callbackUrlFor,
+};
