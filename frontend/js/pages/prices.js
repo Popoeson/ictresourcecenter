@@ -65,11 +65,14 @@
     el.innerHTML = data.map(function (block) {
       var inst = block.institution;
       var rows = block.levels.map(function (l) {
-        return '<div class="price-row" data-kind="ict" data-institution="' + inst.id + '" data-level-key="' + UI.esc(l.levelKey) +
+        return '<div class="price-row' + (block.hasComputerScience ? ' price-row-three' : '') + '" data-kind="ict" data-institution="' + inst.id + '" data-level-key="' + UI.esc(l.levelKey) +
           '" data-level="' + UI.esc(l.levelLabel.toLowerCase()) + '" data-price-id="' + (l.priceId || '') + '">' +
           '<div class="price-level">' + UI.esc(l.levelLabel) + '</div>' +
           moneyField('ICT fee', 'ictFee', l.ictFee, l.levelLabel) +
           moneyField('Handout price', 'handoutPrice', l.handoutPrice, l.levelLabel) +
+          (block.hasComputerScience
+            ? moneyField('Departmental fee (Computer Science)', 'departmentalFee', l.departmentalFee, l.levelLabel)
+            : '') +
           '<button type="button" class="btn btn-secondary btn-small" data-act="save">Save</button>' +
           '</div>';
       }).join('');
@@ -291,7 +294,8 @@
     }
 
     var priceId = row.getAttribute('data-price-id');
-    if (values.ictFee === null && values.handoutPrice === null) {
+    var noDepartmental = values.departmentalFee === undefined || values.departmentalFee === null;
+    if (values.ictFee === null && values.handoutPrice === null && noDepartmental) {
       if (!priceId) { UI.setFieldError(inputs[0], 'Enter at least one amount.'); return; }
       runSave(btn, inputs[0], Api.del('/admin/prices/' + priceId), function () {
         row.setAttribute('data-price-id', '');
@@ -305,7 +309,8 @@
         institution: row.getAttribute('data-institution'),
         levelKey: row.getAttribute('data-level-key'),
         ictFee: values.ictFee,
-        handoutPrice: values.handoutPrice
+        handoutPrice: values.handoutPrice,
+        departmentalFee: values.departmentalFee
       }),
       function (doc) {
         row.setAttribute('data-price-id', doc._id);
