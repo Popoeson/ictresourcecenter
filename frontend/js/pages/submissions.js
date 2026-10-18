@@ -294,6 +294,27 @@
     });
   });
 
+ /* ---------- Export ---------- */
+
+  $('export-btn').addEventListener('click', function () {
+    if (el.from.value && el.to.value && el.from.value > el.to.value) {
+      showAlert('warning', 'The "From" date is after the "To" date.', 'Change one of them.');
+      return;
+    }
+    var btn = $('export-btn');
+    clearAlert();
+    btn.disabled = true;
+    UI.showLoader('Preparing your download...');
+    Api.download('/admin/export/submissions', filterParams()).then(
+      function () { UI.hideLoader(); btn.disabled = false; UI.toast('Export downloaded', 'success'); },
+      function (err) {
+        UI.hideLoader();
+        btn.disabled = false;
+        showAlert(err.status === 400 || err.status === 404 ? 'warning' : 'error', err.message, '');
+      }
+    );
+  });
+
   /* ---------- Start ---------- */
 
   Auth.init({ page: 'submissions' }).then(function (admin) {
