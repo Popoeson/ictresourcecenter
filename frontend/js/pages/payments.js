@@ -2,7 +2,8 @@
   'use strict';
 
   var PAGE_SIZE = 25;
-  var TYPE_LABEL = { ict_fee: 'ICT fee', assignment: 'Assignment', handout: 'Handout' };
+  var TYPE_LABEL = { ict_fee: 'ICT fee', departmental_fee: 'Departmental fee', assignment: 'Assignment', handout: 'Handout' };
+
   var STATUS = {
     success: ['Paid', 'green'],
     pending: ['Pending', 'amber'],
