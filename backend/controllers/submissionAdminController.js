@@ -331,4 +331,4 @@ async function zip(req, res, next) {
   }
 }
 
-module.exports = { list, download, remove, zipCheck, zip };
+module.exports = { list, download, remove, zipCheck, zip, buildFilter, toRow, POPULATE };
