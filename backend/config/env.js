@@ -10,6 +10,7 @@ const env = {
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
+  paystackSplitCode: process.env.PAYSTACK_SPLIT_CODE,
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
