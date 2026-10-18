@@ -27,6 +27,8 @@ const handoutRoutes = require('./routes/handoutRoutes');
 const handoutOrderAdminRoutes = require('./routes/handoutOrderAdminRoutes');
 const submissionAdminRoutes = require('./routes/submissionAdminRoutes');
 
+const app = express();
+
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
 app.use(helmet());
