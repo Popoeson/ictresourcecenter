@@ -443,12 +443,13 @@
   /* ---------- Start ---------- */
   Auth.init({ page: 'students' }).then(function (admin) {
     isSuper = admin.role === 'superadmin';
+        // Both roles can add students. Only the Super Admin gets the edit and delete column.
+    el.add.innerHTML = UI.icon('plus', 20) + '<span>Add student</span>';
+    el.add.classList.remove('hidden');
     if (isSuper) {
-      el.add.innerHTML = UI.icon('plus', 20) + '<span>Add student</span>';
-      el.add.classList.remove('hidden');
       $('th-actions').hidden = false;
     } else {
-      $('page-sub').textContent = 'Everyone who offers the course. You have view-only access.';
+      $('page-sub').textContent = 'Everyone who offers the course. You can add students but not edit or delete them.';
     }
 
     Api.get('/lookups/institutions').then(function (list) {
