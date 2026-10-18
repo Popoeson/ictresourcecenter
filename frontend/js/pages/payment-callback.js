@@ -29,6 +29,7 @@
   function retryHref(p) {
     if (p && p.type === 'assignment') return '/submit-assignment.html';
     if (p && p.type === 'handout') return '/buy-handout.html';
+    if (p && p.type === 'departmental_fee') return '/pay-departmental-fee.html';
     if (!p || p.type === 'ict_fee') return '/pay-fee.html';
     return '/';
   }
@@ -72,6 +73,8 @@
     setTitle('Payment received');
     var intro = p.type === 'ict_fee'
       ? UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you. You can download your receipt below.')
+      : p.type === 'departmental_fee'
+      ? UI.alertHtml('success', 'Your departmental fee has been paid.', 'Thank you. You can download your receipt below.')
       : UI.alertHtml('success', 'Your payment was received.', 'Download your receipt below.');
     stateEl.innerHTML = intro + detailsHtml(p) + receiptHtml(p, true);
   }
