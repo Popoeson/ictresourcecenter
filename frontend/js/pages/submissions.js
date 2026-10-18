@@ -111,12 +111,14 @@
     if (!data.items.length) {
       el.count.textContent = '';
       showEmpty(filtersActive() ? 'No submissions yet for this filter.' : 'No submissions yet.');
-      return;
+      updateSelection();showEmpty(filtersActive() ? 'No submissions yet for this filter.' : 'No submissions yet.');
+      updateSelection();
     }
 
     el.empty.classList.add('hidden');
     el.wrap.classList.remove('hidden');
     el.body.innerHTML = data.items.map(rowHtml).join('');
+    updateSelection();
 
     var from = (state.page - 1) * PAGE_SIZE + 1;
     var to = from + data.items.length - 1;
