@@ -21,7 +21,7 @@
     { key: 'handout-settings', label: 'Handout settings', icon: 'sliders', href: '/admin/handout-settings.html', roles: SUPER, ready: true },
     { key: 'tokens', label: 'Tokens', icon: 'key', href: '/admin/tokens.html', roles: SUPER, ready: true },
         { key: 'admins', label: 'Admins', icon: 'shield', href: '/admin/admins.html', roles: SUPER, ready: true },
-    { key: 'audit', label: 'Audit log', icon: 'clipboard', href: '/admin/audit.html', roles: SUPER, ready: false },
+    { key: 'audit', label: 'Audit log', icon: 'clipboard', href: '/admin/audit.html', roles: SUPER, ready: true },
     { key: 'password', label: 'Change password', icon: 'lock', href: '/admin/change-password.html', roles: BOTH, ready: true }
   ];
 
