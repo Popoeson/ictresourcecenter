@@ -1,4 +1,4 @@
-data.total(function () {
+(function () {
   'use strict';
 
   var PAGE_SIZE = 25;
