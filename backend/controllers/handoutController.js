@@ -43,4 +43,4 @@ async function link(req, res, next) {
   }
 }
 
-module.exports = { list, collect, buildFilter, toRow, POPULATE };
+module.exports = { quote, initialize, link };
