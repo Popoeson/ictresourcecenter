@@ -152,4 +152,4 @@ async function reverify(req, res, next) {
   }
 }
 
-module.exports = { list, reverify };
+module.exports = { list, reverify, buildFilter, toRow };
