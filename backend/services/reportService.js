@@ -11,8 +11,8 @@ const VIEWS = {
   handouts: ['class'],
 };
 
-const TYPE_LABEL = { ict_fee: 'ICT fee', assignment: 'Assignment', handout: 'Handout' };
-const TYPE_ORDER = ['ict_fee', 'assignment', 'handout'];
+const TYPE_LABEL = { ict_fee: 'ICT fee', departmental_fee: 'Departmental fee', assignment: 'Assignment', handout: 'Handout' };
+const TYPE_ORDER = ['ict_fee', 'departmental_fee', 'assignment', 'handout'];
 
 function oid(v) {
   return new mongoose.Types.ObjectId(v);
