@@ -449,7 +449,7 @@
     if (isSuper) {
       $('th-actions').hidden = false;
     } else {
-      $('page-sub').textContent = 'Everyone who offers the course. You can add students but not edit or delete them.';
+      $('page-sub').textContent = 'Everyone who offers the course.';
     }
 
     Api.get('/lookups/institutions').then(function (list) {
