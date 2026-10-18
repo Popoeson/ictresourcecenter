@@ -3,7 +3,7 @@
 
   var AUTO_RETRIES = 5;
   var RETRY_MS = 4000;
-  var TYPE_LABEL = { ict_fee: 'ICT course fee', assignment: 'Assignment submission', handout: 'Course handout' };
+  var TYPE_LABEL = { ict_fee: 'ICT course fee', departmental_fee: 'Departmental fee', assignment: 'Assignment submission', handout: 'Course handout' };
 
   function $(id) { return document.getElementById(id); }
 
