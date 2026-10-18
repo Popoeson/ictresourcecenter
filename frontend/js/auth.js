@@ -13,7 +13,7 @@
     { key: 'submissions', label: 'Submissions', icon: 'file', href: '/admin/submissions.html', roles: BOTH, ready: true },
         { key: 'payments', label: 'Payments', icon: 'card', href: '/admin/payments.html', roles: BOTH, ready: true },
     { key: 'handouts', label: 'Handout orders', icon: 'book', href: '/admin/handouts.html', roles: BOTH, ready: true },
-    { key: 'reports', label: 'Reports', icon: 'chart', href: '/admin/reports.html', roles: BOTH, ready: false },
+    { key: 'reports', label: 'Reports', icon: 'chart', href: '/admin/reports.html', roles: BOTH, ready: true },
         { key: 'import', label: 'Imports', icon: 'upload', href: '/admin/import.html', roles: SUPER, ready: true },
         { key: 'structure', label: 'Structure', icon: 'layers', href: '/admin/structure.html', roles: SUPER, ready: true },
         { key: 'prices', label: 'Prices', icon: 'tag', href: '/admin/prices.html', roles: SUPER, ready: true },
