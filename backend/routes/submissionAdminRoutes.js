@@ -15,12 +15,6 @@ const downloadLimiter = makeLimiter({
   message: 'Too many downloads. Please wait a moment and try again.',
 });
 
-const zipLimiter = makeLimiter({
-  windowMs: 60 * 1000,
-  max: 5,
-  message: 'Too many ZIP downloads. Please wait a minute and try again.',
-});
-
 router.use(protect);
 
 // Both roles can view and download
