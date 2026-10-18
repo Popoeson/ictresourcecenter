@@ -98,10 +98,11 @@
             throw err;
           });
         },
-        function () {
+                function () {
           throw makeError('Could not reach the server. Check your connection and try again.', 0, 'NETWORK');
         }
       );
-    },
-   
+    }
+  };
+
 })(window);
