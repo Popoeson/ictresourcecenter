@@ -25,8 +25,8 @@
     q: $('f-q'), inst: $('f-inst'), dept: $('f-dept'), level: $('f-level'),
     from: $('f-from'), to: $('f-to'), clear: $('f-clear'),
     count: $('subs-count'), empty: $('subs-empty'), wrap: $('subs-wrap'), body: $('subs-body'),
-    pager: $('pager'), prev: $('pager-prev'), next: $('pager-next'), info: $('pager-info')
-  };
+    pager: $('pager'), prev: $('pager-prev'), next: $('pager-next'), info: $('pager-info'),
+    zipSel: $('zip-selected'), zipAll: $('zip-all'), checkAll: $('check-all')
 
   function showAlert(type, title, text) { alertEl.innerHTML = UI.alertHtml(type, title, text); }
   function clearAlert() { alertEl.innerHTML = ''; }
@@ -80,6 +80,8 @@
     }
 
     return '<tr>' +
+      '<td class="col-check" data-label="Select"><input type="checkbox" class="row-check" data-id="' + id +
+        '" aria-label="Select ' + UI.esc(s.fileName) + '"></td>' +
       '<td data-label="Uploaded">' + UI.esc(UI.fmtDate(s.uploadedAt)) + '</td>' +
       '<td data-label="Student"><span class="student-name">' + UI.esc(s.studentName || '\u2014') + '</span></td>' +
       '<td data-label="Class">' + UI.esc(klass || '\u2014') + '</td>' +
