@@ -2,6 +2,7 @@ const PDFDocument = require('pdfkit');
 
 const TYPE_LABEL = {
   ict_fee: 'ICT Course Fee',
+  departmental_fee: 'Departmental Fee',
   assignment: 'Assignment Submission',
   handout: 'Course Handout',
 };
