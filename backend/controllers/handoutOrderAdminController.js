@@ -149,4 +149,4 @@ async function collect(req, res, next) {
   }
 }
 
-module.exports = { list, collect };
+module.exports = { list, collect, buildFilter, toRow, POPULATE };
