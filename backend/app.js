@@ -29,6 +29,8 @@ const submissionAdminRoutes = require('./routes/submissionAdminRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 
+const app = express();
+
 app.set('trust proxy', env.trustProxyHops);
 app.disable('x-powered-by');
 app.use(helmet());
