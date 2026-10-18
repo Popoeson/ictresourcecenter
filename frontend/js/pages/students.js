@@ -417,6 +417,29 @@
     );
   });
 
+  /* ---------- Export ---------- */
+
+  $('export-btn').addEventListener('click', function () {
+    var btn = $('export-btn');
+    clearAlert();
+    btn.disabled = true;
+    UI.showLoader('Preparing your download...');
+    Api.download('/admin/export/students', {
+      q: el.q.value.trim(),
+      institution: el.inst.value,
+      department: el.dept.value,
+      level: el.level.value,
+      ictFeePaid: el.fee.value
+    }).then(
+      function () { UI.hideLoader(); btn.disabled = false; UI.toast('Export downloaded', 'success'); },
+      function (err) {
+        UI.hideLoader();
+        btn.disabled = false;
+        showAlert(err.status === 400 || err.status === 404 ? 'warning' : 'error', err.message, '');
+      }
+    );
+  });
+
   /* ---------- Start ---------- */
   Auth.init({ page: 'students' }).then(function (admin) {
     isSuper = admin.role === 'superadmin';
