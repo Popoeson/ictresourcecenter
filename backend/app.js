@@ -28,6 +28,7 @@ const handoutOrderAdminRoutes = require('./routes/handoutOrderAdminRoutes');
 const submissionAdminRoutes = require('./routes/submissionAdminRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use('/api/admin/handout-orders', handoutOrderAdminRoutes);
 app.use('/api/admin/submissions', submissionAdminRoutes);
 app.use('/api/admin/export', exportRoutes);
 app.use('/api/admin/reports', reportRoutes);
+app.use('/api/admin/dashboard', dashboardRoutes);
 
 // Keep this one after the other /api/admin routers: it applies login protection to everything under /api/admin
 app.use('/api/admin', structureRoutes);
