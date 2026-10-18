@@ -561,6 +561,10 @@ a { color: var(--text); }
 .choice-text { display: block; font-size: 14px; color: var(--text-muted); }
 #delivery-note { margin: 0 0 16px; }
 
+/* ---------- Submissions: row selection ---------- */
+.col-check { width: 48px; }
+.row-check, #check-all { width: 24px; height: 24px; accent-color: var(--text); cursor: pointer; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
