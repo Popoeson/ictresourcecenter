@@ -67,7 +67,41 @@
     put: function (path, body, opts) { return request('PUT', path, body, opts); },
     patch: function (path, body, opts) { return request('PATCH', path, body, opts); },
     del: function (path, opts) { return request('DELETE', path, undefined, opts); },
-    upload: function (path, formData, opts) { return request('POST', path, formData, opts); },
-    qs: qs
-  };
+        upload: function (path, formData, opts) { return request('POST', path, formData, opts); },
+    // Downloads a file. Errors come back as normal errors, so the page can show a message.
+    download: function (path, params, opts) {
+      return fetch('/api' + path + qs(params), { method: 'GET', credentials: 'same-origin' }).then(
+        function (res) {
+          if (res.ok) {
+            var cd = res.headers.get('Content-Disposition') || '';
+            var m = /filename="([^"]+)"/.exec(cd);
+            var name = m ? m[1] : 'download';
+            return res.blob().then(function (blob) {
+              var url = URL.createObjectURL(blob);
+              var a = document.createElement('a');
+              a.href = url;
+              a.download = name;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+              return name;
+            });
+          }
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            var err = makeError(
+              data.message || 'Something went wrong. Please try again.',
+              res.status,
+              data.code || 'ERROR'
+            );
+            handleAuthRedirect(err, opts);
+            throw err;
+          });
+        },
+        function () {
+          throw makeError('Could not reach the server. Check your connection and try again.', 0, 'NETWORK');
+        }
+      );
+    },
+   
 })(window);
