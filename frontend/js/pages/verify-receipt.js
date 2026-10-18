@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var TYPE_LABEL = { ict_fee: 'ICT course fee', assignment: 'Assignment submission', handout: 'Course handout' };
+  var TYPE_LABEL = { ict_fee: 'ICT course fee', departmental_fee: 'Departmental fee', assignment: 'Assignment submission', handout: 'Course handout' };
 
   function $(id) { return document.getElementById(id); }
 
