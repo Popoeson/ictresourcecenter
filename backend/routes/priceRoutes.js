@@ -21,9 +21,10 @@ const saveSchema = z
     levelKey: z.string().trim().min(1).max(120),
     ictFee: kobo,
     handoutPrice: kobo,
+    departmentalFee: kobo,
   })
   .refine(
-    (d) => d.ictFee !== undefined || d.handoutPrice !== undefined,
+    (d) => d.ictFee !== undefined || d.handoutPrice !== undefined || d.departmentalFee !== undefined,
     'Nothing to update.'
   );
 
