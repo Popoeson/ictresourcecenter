@@ -32,7 +32,7 @@ function fail(res, next, err) {
   next(err);
 }
 
-const TYPE_LABEL = { ict_fee: 'ICT fee', assignment: 'Assignment', handout: 'Handout' };
+const TYPE_LABEL = { ict_fee: 'ICT fee', departmental_fee: 'Departmental fee', assignment: 'Assignment', handout: 'Handout' };
 
 /* ---------- Students ---------- */
 
