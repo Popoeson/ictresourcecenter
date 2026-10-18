@@ -183,8 +183,85 @@
   el.prev.addEventListener('click', function () { loadList(state.page - 1); });
   el.next.addEventListener('click', function () { loadList(state.page + 1); });
 
-  /* ---------- Delete (Super Admin) ---------- */
+  /* ---------- ZIP download ---------- */
 
+  function checkedIds() {
+    return Array.prototype.map.call(el.body.querySelectorAll('.row-check:checked'), function (c) {
+      return c.getAttribute('data-id');
+    });
+  }
+
+  function updateSelection() {
+    var boxes = el.body.querySelectorAll('.row-check');
+    var n = checkedIds().length;
+    el.zipSel.disabled = n === 0;
+    el.zipSel.textContent = n ? 'Download selected (' + n + ') as ZIP' : 'Download selected as ZIP';
+    el.zipAll.disabled = state.total === 0;
+    el.checkAll.checked = boxes.length > 0 && n === boxes.length;
+    el.checkAll.indeterminate = n > 0 && n < boxes.length;
+  }
+
+  function filterParams() {
+    return {
+      q: el.q.value.trim(),
+      institution: el.inst.value,
+      department: el.dept.value,
+      level: el.level.value,
+      from: el.from.value,
+      to: el.to.value
+    };
+  }
+
+  function startZip(params) {
+    clearAlert();
+    UI.showLoader('Preparing your download...');
+    Api.get('/admin/submissions/zip/check', params).then(
+      function (r) {
+        UI.hideLoader();
+        if (!r.count) {
+          showAlert('info', 'No files to download.', 'Change the filter and try again.');
+          return;
+        }
+        if (r.tooMany) {
+          showAlert('warning', 'Too many files for one ZIP.',
+            r.count + ' files match. The limit is ' + r.max + '. Narrow the filter and try again.');
+          return;
+        }
+        UI.toast('Your download is starting. Large ZIPs can take a minute.', 'info');
+        window.location.href = '/api/admin/submissions/zip' + Api.qs(params);
+      },
+      function (err) {
+        UI.hideLoader();
+        showAlert('error', err.message, '');
+      }
+    );
+  }
+
+  el.body.addEventListener('change', function (e) {
+    if (e.target.classList.contains('row-check')) updateSelection();
+  });
+
+  el.checkAll.addEventListener('change', function () {
+    Array.prototype.forEach.call(el.body.querySelectorAll('.row-check'), function (c) {
+      c.checked = el.checkAll.checked;
+    });
+    updateSelection();
+  });
+
+  el.zipSel.addEventListener('click', function () {
+    var ids = checkedIds();
+    if (ids.length) startZip({ ids: ids.join(',') });
+  });
+
+  el.zipAll.addEventListener('click', function () {
+    if (el.from.value && el.to.value && el.from.value > el.to.value) {
+      showAlert('warning', 'The "From" date is after the "To" date.', 'Change one of them.');
+      return;
+    }
+    startZip(filterParams());
+  });
+
+  /* ---------- Delete (Super Admin) ---------- */
   el.body.addEventListener('click', function (e) {
     var btn = e.target.closest('button[data-act="delete"]');
     if (!btn) return;
