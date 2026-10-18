@@ -53,7 +53,9 @@ async function fulfilPayment(reference, via, ps) {
     won = await Payment.findOneAndUpdate({ reference, status: 'pending' }, { $set: set }, { new: true });
   } catch (err) {
     if (err && err.code === 11000) {
-      await flag(reference, 'This student already paid the ICT fee. Refund this payment in Paystack.');
+            const dup = await Payment.findOne({ reference }).select('type').lean();
+      const what = dup && dup.type === 'departmental_fee' ? 'departmental fee' : 'ICT fee';
+      await flag(reference, 'This student already paid the ' + what + '. Refund this payment in Paystack.');
       return Payment.findOne({ reference });
     }
     throw err;
