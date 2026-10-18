@@ -586,6 +586,17 @@ a { color: var(--text); }
 .chart-bar::-webkit-progress-value { background: var(--accent-hover); }
 .chart-bar::-moz-progress-bar { background: var(--accent-hover); }
 
+/* ---------- Overview ---------- */
+.overview-section { margin-bottom: 24px; }
+.overview-section h2 { margin-bottom: 16px; }
+.attention-list { list-style: none; margin: 0; padding: 0; }
+.attention-item {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--border);
+}
+.attention-item:first-child { border-top: 0; padding-top: 0; }
+.overview-more { margin-top: 16px; }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
