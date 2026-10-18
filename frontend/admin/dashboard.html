@@ -14,11 +14,40 @@
   <div id="page-content" class="hidden">
     <div class="shell-heading">
       <h1 id="greeting">Welcome</h1>
-      <p class="muted">Your overview will show payments and orders here once those parts of the site are built.</p>
+      <p class="muted">Here is how the course is going.</p>
     </div>
-    <div class="card">
-      <p class="empty-state">Nothing to show yet.</p>
-    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="stat-grid" id="stat-grid"></div>
+
+    <section class="card overview-section" aria-labelledby="attention-title">
+      <h2 id="attention-title">Needs attention</h2>
+      <div id="attention" aria-live="polite"><p class="hint">Loading...</p></div>
+    </section>
+
+    <section class="card overview-section" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent payments</h2>
+      <p class="hint" id="recent-status" aria-live="polite">Loading...</p>
+      <div id="recent-empty" class="hidden"><p class="empty-state">No payments yet.</p></div>
+      <div class="table-wrap hidden" id="recent-wrap">
+        <table class="table responsive students-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Paid by</th>
+              <th>Payment for</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+      <div class="overview-more hidden" id="recent-more">
+        <a class="btn btn-secondary btn-small" href="/admin/payments.html">View all payments</a>
+      </div>
+    </section>
   </div>
 
   <script src="/js/ui.js"></script>
