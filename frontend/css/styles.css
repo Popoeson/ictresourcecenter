@@ -597,6 +597,11 @@ a { color: var(--text); }
 .attention-item:first-child { border-top: 0; padding-top: 0; }
 .overview-more { margin-top: 16px; }
 
+/* ---------- Prices: extra Departmental fee column ---------- */
+@media (min-width: 700px) {
+  .price-row-three { grid-template-columns: 1.2fr 1fr 1fr 1fr auto; }
+}
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
