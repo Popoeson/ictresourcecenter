@@ -30,6 +30,7 @@ const exportRoutes = require('./routes/exportRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const departmentalAdminRoutes = require('./routes/departmentalAdminRoutes');
+const auditAdminRoutes = require('./routes/auditAdminRoutes');
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.use('/api/admin/export', exportRoutes);
 app.use('/api/admin/reports', reportRoutes);
 app.use('/api/admin/dashboard', dashboardRoutes);
 app.use('/api/admin/departmental-fee', departmentalAdminRoutes);
+app.use('/api/admin/audit', auditAdminRoutes);
 
 // Keep this one after the other /api/admin routers: it applies login protection to everything under /api/admin
 app.use('/api/admin', structureRoutes);
