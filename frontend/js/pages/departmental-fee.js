@@ -199,7 +199,7 @@
     clearAlert();
     el.exportBtn.disabled = true;
     UI.showLoader('Preparing your download...');
-    Api.download('/admin/export/../departmental-fee/export'.replace('/export/../', '/'), params()).then(
+    Api.download('/admin/departmental-fee/export', params()).then(
       function () { UI.hideLoader(); el.exportBtn.disabled = false; UI.toast('Export downloaded', 'success'); },
       function (err) {
         UI.hideLoader();
