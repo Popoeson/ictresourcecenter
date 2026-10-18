@@ -39,4 +39,4 @@ async function verify(req, res, next) {
   }
 }
 
-module.exports = { list, reverify, buildFilter, toRow };
+module.exports = { quote, initialize, verify };
