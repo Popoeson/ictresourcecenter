@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Reports | ICT Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div id="page-content" class="hidden">
+    <div class="shell-heading">
+      <h1>Reports</h1>
+      <p class="muted" id="tab-sub"></p>
+    </div>
+
+    <div id="page-alert" aria-live="polite"></div>
+
+    <div class="report-tabs" role="tablist" aria-label="Reports" id="report-tabs">
+      <button type="button" class="report-tab" role="tab" data-tab="students" aria-selected="true">Students</button>
+      <button type="button" class="report-tab" role="tab" data-tab="submissions" aria-selected="false">Submissions</button>
+      <button type="button" class="report-tab" role="tab" data-tab="payments" aria-selected="false">Payments</button>
+      <button type="button" class="report-tab" role="tab" data-tab="handouts" aria-selected="false">Handouts</button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="field hidden" id="fld-view">
+        <label for="f-view">Show</label>
+        <select class="select" id="f-view"></select>
+      </div>
+      <div class="field">
+        <label for="f-inst">Institution</label>
+        <select class="select" id="f-inst"></select>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select class="select" id="f-dept" disabled></select>
+      </div>
+      <div class="field">
+        <label for="f-level">Level</label>
+        <select class="select" id="f-level" disabled></select>
+      </div>
+      <div class="field" id="fld-from">
+        <label for="f-from">From</label>
+        <input class="input" id="f-from" type="date">
+      </div>
+      <div class="field" id="fld-to">
+        <label for="f-to">To</label>
+        <input class="input" id="f-to" type="date">
+      </div>
+    </div>
+    <div class="btn-row filter-actions">
+      <button type="button" class="btn btn-secondary btn-small" id="f-clear">Clear filters</button>
+      <button type="button" class="btn btn-secondary btn-small" id="export-btn">Export to Excel</button>
+    </div>
+
+    <div class="stat-grid hidden" id="stat-grid"></div>
+
+    <section class="card chart-card hidden" id="chart-card" aria-labelledby="chart-title">
+      <h2 id="chart-title"></h2>
+      <div id="chart-rows"></div>
+    </section>
+
+    <p class="hint" id="report-count" aria-live="polite"></p>
+
+    <div id="report-empty" class="card hidden"></div>
+
+    <div class="table-wrap hidden" id="report-wrap">
+      <table class="table responsive students-table">
+        <thead><tr id="report-head"></tr></thead>
+        <tbody id="report-body"></tbody>
+      </table>
+    </div>
+
+    <div class="pager hidden" id="pager">
+      <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
+      <span class="pager-info" id="pager-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+  </div>
+
+  <script src="/js/ui.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/pages/reports.js"></script>
+</body>
+</html>
