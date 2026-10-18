@@ -18,7 +18,9 @@ function client() {
   });
 }
 
-// Split payments are not used in v1. A later version can add subaccount or split_code here.
+// Builds the Paystack request. If a split code is set, Paystack applies the split and shows it in its own
+// dashboard. The amount charged and recorded on this site stays the full amount.
+
 function buildInitializeBody({ email, amountKobo, reference, callbackUrl, metadata, split }) {
   const body = {
     email,
@@ -28,7 +30,8 @@ function buildInitializeBody({ email, amountKobo, reference, callbackUrl, metada
     callback_url: callbackUrl,
     metadata: metadata || {},
   };
-  if (split && split.code) body.split_code = split.code;
+    const splitCode = (split && split.code) || (env.paystackSplitCode || '').trim();
+  if (splitCode) body.split_code = splitCode;
   return body;
 }
 
