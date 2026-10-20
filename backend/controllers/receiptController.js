@@ -4,10 +4,10 @@ const { ensureReceiptNumber } = require('../services/fulfilmentService');
 const { buildReceipt } = require('../services/receiptService');
 const qr = require('../services/qrService');
 
-// Only paid references return a receipt
+// Receipts exist only for paid ICT fee payments
 async function download(req, res, next) {
   try {
-    let payment = await Payment.findOne({ reference: req.params.reference, status: 'success' });
+    let payment = await Payment.findOne({ reference: req.params.reference, status: 'success', type: 'ict_fee' });
     if (!payment) throw new AppError('Receipt not found.', 404, 'NOT_FOUND');
 
     if (!payment.receiptNumber) await ensureReceiptNumber(payment);
@@ -16,7 +16,7 @@ async function download(req, res, next) {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="receipt-' + payment.receiptNumber + '.pdf"');
     res.setHeader('Cache-Control', 'no-store');
-        const qrPng = await qr.pngBuffer(qr.verifyUrl(payment.reference), 300);
+    const qrPng = await qr.pngBuffer(qr.verifyUrl(payment.reference), 300);
     const doc = buildReceipt(payment, qrPng);
     doc.pipe(res);
     doc.end();
@@ -25,10 +25,10 @@ async function download(req, res, next) {
   }
 }
 
-// The QR image for a paid reference, shown on the callback page
+// The QR image for a paid ICT fee reference
 async function qrImage(req, res, next) {
   try {
-    const payment = await Payment.findOne({ reference: req.params.reference, status: 'success' }).select('reference');
+    const payment = await Payment.findOne({ reference: req.params.reference, status: 'success', type: 'ict_fee' }).select('reference');
     if (!payment) throw new AppError('Receipt not found.', 404, 'NOT_FOUND');
     const png = await qr.pngBuffer(qr.verifyUrl(payment.reference), 360);
     res.setHeader('Content-Type', 'image/png');
@@ -39,10 +39,10 @@ async function qrImage(req, res, next) {
   }
 }
 
-// Public check used by the page the QR code opens. Returns the minimum needed to compare with the person presenting it.
+// Public check used by the page the QR code opens (ICT fee receipts only)
 async function verify(req, res, next) {
   try {
-    const p = await Payment.findOne({ reference: req.params.reference, status: 'success' })
+    const p = await Payment.findOne({ reference: req.params.reference, status: 'success', type: 'ict_fee' })
       .populate('institution', 'name')
       .populate('level', 'name');
     if (!p) throw new AppError('This receipt could not be verified.', 404, 'NOT_FOUND');
