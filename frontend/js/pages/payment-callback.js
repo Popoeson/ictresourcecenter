@@ -28,6 +28,9 @@
     if (type === 'handout') {
       return '<p class="hint">Keep this page link. You can open it again to see your handout or pickup code.</p>';
     }
+    if (type === 'ict_fee') {
+      return '<p class="hint">Keep this page link. You can open it again to see your receipt.</p>';
+    }
     return '';
   }
 
@@ -43,7 +46,7 @@
     if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   }
 
-  /* ---------- Parts shared by the success states (no receipts on the public side) ---------- */
+  /* ---------- Parts shared by the success states ---------- */
 
   function detailsHtml(p, extraRows) {
     return '<dl class="detail-list">' +
@@ -52,8 +55,21 @@
       detailRow('Amount', UI.naira(p.amount)) +
       detailRow('Paid by', p.payerName) +
       detailRow('Date', UI.fmtDate(p.paidAt)) +
+      (p.type === 'ict_fee' ? detailRow('Receipt number', p.receiptNumber) : '') +
       detailRow('Reference', p.reference) +
       '</dl>';
+  }
+
+  // Receipts exist only for the ICT fee
+  function receiptHtml(p) {
+    return '<div class="qr-block">' +
+        '<img class="qr-img" src="/api/receipts/' + encodeURIComponent(p.reference) + '/qr.png" width="160" height="160" alt="QR code for verifying this receipt">' +
+        '<p class="hint">Show this code to your lecturer to verify your receipt.</p>' +
+      '</div>' +
+      '<a class="btn btn-primary btn-block" href="/api/receipts/' +
+        encodeURIComponent(p.reference) + '" download>Download receipt</a>' +
+      '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>' +
+      keepNote(p.type);
   }
 
   function finishHtml(p, homeIsPrimary) {
@@ -69,9 +85,13 @@
     if (p.type === 'handout') return renderHandout(p, handout);
 
     setTitle('Payment received');
-    var intro = p.type === 'ict_fee'
-      ? UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you.')
-      : p.type === 'departmental_fee'
+    if (p.type === 'ict_fee') {
+      stateEl.innerHTML =
+        UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you. You can download your receipt below.') +
+        detailsHtml(p) + receiptHtml(p);
+      return;
+    }
+    var intro = p.type === 'departmental_fee'
       ? UI.alertHtml('success', 'Your departmental fee has been paid.', 'Thank you.')
       : UI.alertHtml('success', 'Your payment was received.', 'Thank you.');
     stateEl.innerHTML = intro + detailsHtml(p) + finishHtml(p, true);
