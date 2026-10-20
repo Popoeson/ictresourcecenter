@@ -12,8 +12,7 @@
     searchBlock: $('search-block'), status: $('search-status'), results: $('name-results'),
     chosen: $('chosen'), chosenName: $('chosen-name'), chosenDept: $('chosen-dept'), change: $('chosen-change'),
     feeCard: $('fee-card'), feeAmount: $('fee-amount'), feeFor: $('fee-for'),
-    pay: $('pay-btn'), paidCard: $('paid-card'), receipt: $('receipt-link'), alert: $('page-alert')
-  };
+        pay: $('pay-btn'), paidCard: $('paid-card'), alert: $('page-alert')
 
   var found = {};
   var selected = null;
@@ -144,8 +143,7 @@
     Api.get('/pricing/quote', { type: TYPE, studentId: selected.id }).then(
       function (q) {
         UI.hideLoader();
-        if (q.alreadyPaid) {
-          el.receipt.href = '/api/receipts/' + encodeURIComponent(q.reference);
+                if (q.alreadyPaid) {
           show(el.paidCard);
           return;
         }
