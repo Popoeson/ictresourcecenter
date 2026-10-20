@@ -92,7 +92,7 @@
 
   function actionsCell(p) {
     var html = '';
-    if (p.status === 'success') {
+        if (p.status === 'success' && p.type === 'ict_fee') {
       html = '<a class="text-link-inline" href="/api/receipts/' + encodeURIComponent(p.reference) + '" download>Receipt</a>';
     } else if (isSuper && p.status === 'pending') {
       html = '<button type="button" class="btn btn-secondary btn-small" data-act="reverify" data-id="' + UI.esc(p.id) + '">Re-verify</button>';
