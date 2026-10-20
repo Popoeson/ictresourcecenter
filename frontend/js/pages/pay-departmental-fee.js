@@ -12,7 +12,8 @@
     searchBlock: $('search-block'), status: $('search-status'), results: $('name-results'),
     chosen: $('chosen'), chosenName: $('chosen-name'), chosenDept: $('chosen-dept'), change: $('chosen-change'),
     feeCard: $('fee-card'), feeAmount: $('fee-amount'), feeFor: $('fee-for'),
-        pay: $('pay-btn'), paidCard: $('paid-card'), alert: $('page-alert')
+            pay: $('pay-btn'), paidCard: $('paid-card'), alert: $('page-alert')
+  };
 
   var found = {};
   var selected = null;
