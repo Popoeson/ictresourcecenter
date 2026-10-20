@@ -22,8 +22,13 @@
   }
 
   function keepNote(type) {
-    return '<p class="hint">Keep this page link. You can open it again to see your ' +
-      (type === 'assignment' ? 'token or receipt.' : type === 'handout' ? 'handout, pickup code or receipt.' : 'receipt.') + '</p>';
+    if (type === 'assignment') {
+      return '<p class="hint">Keep this page link. You can open it again to see your token.</p>';
+    }
+    if (type === 'handout') {
+      return '<p class="hint">Keep this page link. You can open it again to see your handout or pickup code.</p>';
+    }
+    return '';
   }
 
   function retryHref(p) {
@@ -38,7 +43,7 @@
     if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   }
 
-  /* ---------- Receipt parts shared by the success states ---------- */
+  /* ---------- Parts shared by the success states (no receipts on the public side) ---------- */
 
   function detailsHtml(p, extraRows) {
     return '<dl class="detail-list">' +
@@ -47,19 +52,12 @@
       detailRow('Amount', UI.naira(p.amount)) +
       detailRow('Paid by', p.payerName) +
       detailRow('Date', UI.fmtDate(p.paidAt)) +
-      detailRow('Receipt number', p.receiptNumber) +
       detailRow('Reference', p.reference) +
       '</dl>';
   }
 
-  function receiptHtml(p, downloadIsPrimary) {
-    return '<div class="qr-block">' +
-        '<img class="qr-img" src="/api/receipts/' + encodeURIComponent(p.reference) + '/qr.png" width="160" height="160" alt="QR code for verifying this receipt">' +
-        '<p class="hint">Show this code to your lecturer to verify your receipt.</p>' +
-      '</div>' +
-      '<a class="btn ' + (downloadIsPrimary ? 'btn-primary' : 'btn-secondary') + ' btn-block" href="/api/receipts/' +
-        encodeURIComponent(p.reference) + '" download>Download receipt</a>' +
-      '<a class="btn btn-secondary btn-block btn-gap" href="/">Back to home</a>' +
+  function finishHtml(p, homeIsPrimary) {
+    return '<a class="btn ' + (homeIsPrimary ? 'btn-primary' : 'btn-secondary') + ' btn-block btn-gap" href="/">Back to home</a>' +
       keepNote(p.type);
   }
 
@@ -72,11 +70,11 @@
 
     setTitle('Payment received');
     var intro = p.type === 'ict_fee'
-      ? UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you. You can download your receipt below.')
+      ? UI.alertHtml('success', 'Your ICT fee has been paid.', 'Thank you.')
       : p.type === 'departmental_fee'
-      ? UI.alertHtml('success', 'Your departmental fee has been paid.', 'Thank you. You can download your receipt below.')
-      : UI.alertHtml('success', 'Your payment was received.', 'Download your receipt below.');
-    stateEl.innerHTML = intro + detailsHtml(p) + receiptHtml(p, true);
+      ? UI.alertHtml('success', 'Your departmental fee has been paid.', 'Thank you.')
+      : UI.alertHtml('success', 'Your payment was received.', 'Thank you.');
+    stateEl.innerHTML = intro + detailsHtml(p) + finishHtml(p, true);
   }
 
   function mmss(total) {
@@ -157,7 +155,7 @@
             ' (5 MB each). Valid for 30 minutes from payment.</p>' +
         '</section>' +
         '<a class="btn btn-primary btn-block" id="continue-upload" href="/upload.html#' + encodeURIComponent(token.code) + '">Continue to upload</a>' +
-        detailsHtml(p, rows) + receiptHtml(p, false);
+        detailsHtml(p, rows) + finishHtml(p, false);
       $('copy-token').addEventListener('click', function () { copyToken(token.code); });
       startCountdown(token.secondsLeft);
       return;
@@ -166,15 +164,15 @@
     var status = token ? token.status : 'expired';
     var message;
     if (status === 'used') {
-      message = UI.alertHtml('info', 'This token has already been used.', 'Your files were submitted. You can still download your receipt below.') +
+      message = UI.alertHtml('info', 'This token has already been used.', 'Your files were submitted.') +
         '<a class="btn btn-secondary btn-block" href="/submit-assignment.html">Submit more files</a>';
     } else if (status === 'revoked') {
-      message = UI.alertHtml('warning', 'This token is no longer valid.', 'Please contact your course lecturer. You can still download your receipt below.');
+      message = UI.alertHtml('warning', 'This token is no longer valid.', 'Please contact your course lecturer.');
     } else {
       message = UI.alertHtml('warning', 'The time for this token is over.',
-        'Pay again for a new token and a new 30 minutes. You can still download your receipt below.') + payAgainHtml();
+        'Pay again for a new token and a new 30 minutes.') + payAgainHtml();
     }
-    stateEl.innerHTML = message + detailsHtml(p, rows) + receiptHtml(p, false);
+    stateEl.innerHTML = message + detailsHtml(p, rows) + finishHtml(p, false);
   }
 
   function renderHandout(p, h) {
@@ -185,14 +183,14 @@
     if (!h) {
       stateEl.innerHTML =
         UI.alertHtml('success', 'Your payment was received.',
-          'We are still preparing your order. Reload this page in a moment. Your receipt is ready below.') +
-        details + receiptHtml(p, true);
+          'We are still preparing your order. Reload this page in a moment.') +
+        details + finishHtml(p, true);
       return;
     }
 
     if (h.delivery === 'pickup') {
       var intro = h.pickupStatus === 'collected'
-        ? UI.alertHtml('info', 'This copy has been collected.', 'Your receipt is below.')
+        ? UI.alertHtml('info', 'This copy has been collected.', '')
         : UI.alertHtml('success', 'Your payment was received.', 'Show your pickup code when you collect your copy.');
       stateEl.innerHTML = intro +
         '<section class="token-card" aria-label="Your pickup code">' +
@@ -201,7 +199,7 @@
           '<button type="button" class="btn btn-secondary btn-small" id="copy-pickup">Copy code</button>' +
           '<p class="hint">Show this code to your course lecturer when you collect your copy.</p>' +
         '</section>' +
-        details + receiptHtml(p, true);
+        details + finishHtml(p, false);
       $('copy-pickup').addEventListener('click', function () { copyToken(h.pickupCode); });
       return;
     }
@@ -209,11 +207,11 @@
     var intro2 = h.pdfAvailable
       ? UI.alertHtml('success', 'Your payment was received.', 'Download your handout below.')
       : UI.alertHtml('warning', 'Your handout PDF is not available right now.',
-          'Please contact your course lecturer and give them your reference. Your receipt is below.');
+          'Please contact your course lecturer and give them your reference.');
     var action = h.pdfAvailable
       ? '<button type="button" class="btn btn-primary btn-block" id="download-handout">Download handout</button>'
       : '';
-    stateEl.innerHTML = intro2 + action + details + receiptHtml(p, false);
+    stateEl.innerHTML = intro2 + action + details + finishHtml(p, false);
 
     var dl = $('download-handout');
     if (dl) {
