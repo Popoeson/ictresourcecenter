@@ -11,7 +11,7 @@ const REF_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const DEFAULT_MAX_FILES = 10;
 
 // The departmental fee is only for students in a department with this name, in any institution
-const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science','Computer Engineering');
+const DEPARTMENTAL_DEPARTMENT_KEYS = [normKey('Computer Science'), normKey('Computer Engineering')];
 
 const PAYABLE_TYPES = ['ict_fee', 'assignment', 'departmental_fee'];
 
@@ -62,8 +62,8 @@ async function quoteIctFee(studentId) {
 // Only Computer Science students pay it
 async function ensureDepartmentalEligible(student) {
   const dept = await Department.findById(student.department).select('nameKey');
-  if (!dept || dept.nameKey !== DEPARTMENTAL_DEPARTMENT_KEY) {
-    throw new AppError('The departmental fee is only for Computer Science students.', 403, 'NOT_ELIGIBLE');
+    if (!dept || !DEPARTMENTAL_DEPARTMENT_KEYS.includes(dept.nameKey)) {
+    throw new AppError('The departmental fee is only for Computer Science and Computer Engineering students.', 403, 'NOT_ELIGIBLE');
   }
 }
 
