@@ -11,7 +11,7 @@ const REF_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const DEFAULT_MAX_FILES = 10;
 
 // The departmental fee is only for students in a department with this name, in any institution
-const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science');
+const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science','Computer Engineering');
 
 const PAYABLE_TYPES = ['ict_fee', 'assignment', 'departmental_fee'];
 
