@@ -3,6 +3,7 @@ const { z } = require('zod');
 const { validate } = require('../middleware/validate');
 const { protect, requireRole } = require('../middleware/auth');
 const c = require('../controllers/paymentAdminController');
+const receipts = require('../controllers/receiptController');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const listSchema = z.object({
   page: z.string().regex(/^\d+$/).optional(),
   limit: z.string().regex(/^\d+$/).optional(),
   q: z.string().max(100).optional(),
-  type: z.enum(['ict_fee', 'assignment', 'handout']).optional(),
+  type: z.enum(['ict_fee', 'departmental_fee', 'assignment', 'handout']).optional(),
   status: z.enum(['pending', 'success', 'failed', 'abandoned', 'flagged']).optional(),
   institution: objectId.optional(),
   department: objectId.optional(),
@@ -22,10 +23,13 @@ const listSchema = z.object({
   to: day.optional(),
 });
 const idParams = z.object({ id: objectId });
+const refParams = z.object({ reference: z.string().regex(/^PAY-[A-Z0-9]{12}$/, 'Invalid reference.') });
 
 // Admin and Super Admin can view. Only the Super Admin can re-verify.
 router.use(protect);
 router.get('/', validate(listSchema, 'query'), c.list);
+// Receipt PDF for a paid payment (ICT fee and departmental fee), login required
+router.get('/receipt/:reference', validate(refParams, 'params'), receipts.adminDownload);
 router.post('/:id/reverify', requireRole('superadmin'), validate(idParams, 'params'), c.reverify);
 
 module.exports = router;
