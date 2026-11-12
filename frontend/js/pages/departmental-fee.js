@@ -110,7 +110,7 @@
   function rowHtml(s) {
     var contact = [s.phone, s.email].filter(Boolean).join(' \u00B7 ');
     var receipt = s.paid && s.reference
-      ? '<a class="text-link-inline" href="/api/receipts/' + encodeURIComponent(s.reference) + '" download>Receipt</a>'
+      ? '<a class="text-link-inline" href="/api/admin/payments/receipt/' + encodeURIComponent(s.reference) + '" download>Receipt</a>'
       : dash();
     return '<tr>' +
       '<td data-label="Student"><span class="student-name">' + UI.esc(s.name) + '</span>' +
@@ -151,7 +151,7 @@
       el.count.textContent = '';
       showEmpty(filtersActive()
         ? 'No students match your filters.'
-        : 'No Computer Science students yet. Add the department in Structure and import or add students.');
+        : 'No Computer Science or Computer Engineering students yet. Add the department in Structure and import or add students.');
       return;
     }
 
@@ -169,7 +169,7 @@
     el.next.disabled = state.page >= state.totalPages;
   }
 
-  function loadList(page) {
+   function loadList(page) {
     var id = ++requestId;
     clearAlert();
     el.count.textContent = 'Loading students...';
