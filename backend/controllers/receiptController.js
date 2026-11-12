@@ -4,22 +4,38 @@ const { ensureReceiptNumber } = require('../services/fulfilmentService');
 const { buildReceipt } = require('../services/receiptService');
 const qr = require('../services/qrService');
 
-// Receipts exist only for paid ICT fee payments
+// Builds and sends the receipt PDF for a paid payment of one of the allowed types
+async function sendReceipt(res, reference, types) {
+  let payment = await Payment.findOne({ reference, status: 'success', type: { $in: types } });
+  if (!payment) throw new AppError('Receipt not found.', 404, 'NOT_FOUND');
+
+  if (!payment.receiptNumber) await ensureReceiptNumber(payment);
+  payment = await Payment.findById(payment._id).populate('institution', 'name').populate('level', 'name');
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="receipt-' + payment.receiptNumber + '.pdf"');
+  res.setHeader('Cache-Control', 'no-store');
+  const qrPng = await qr.pngBuffer(qr.verifyUrl(payment.reference), 300);
+  const doc = buildReceipt(payment, qrPng);
+  doc.pipe(res);
+  doc.end();
+}
+
+// Public: receipts exist only for paid ICT fee payments
 async function download(req, res, next) {
   try {
-    let payment = await Payment.findOne({ reference: req.params.reference, status: 'success', type: 'ict_fee' });
-    if (!payment) throw new AppError('Receipt not found.', 404, 'NOT_FOUND');
+    await sendReceipt(res, req.params.reference, ['ict_fee']);
+  } catch (err) {
+    next(err);
+  }
+}
 
-    if (!payment.receiptNumber) await ensureReceiptNumber(payment);
-    payment = await Payment.findById(payment._id).populate('institution', 'name').populate('level', 'name');
+// Admin side only (login required, set in the routes file): receipts for these payment types
+const ADMIN_RECEIPT_TYPES = ['ict_fee', 'departmental_fee'];
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="receipt-' + payment.receiptNumber + '.pdf"');
-    res.setHeader('Cache-Control', 'no-store');
-    const qrPng = await qr.pngBuffer(qr.verifyUrl(payment.reference), 300);
-    const doc = buildReceipt(payment, qrPng);
-    doc.pipe(res);
-    doc.end();
+async function adminDownload(req, res, next) {
+  try {
+    await sendReceipt(res, req.params.reference, ADMIN_RECEIPT_TYPES);
   } catch (err) {
     next(err);
   }
@@ -66,4 +82,4 @@ async function verify(req, res, next) {
   }
 }
 
-module.exports = { download, qrImage, verify };
+module.exports = { download, adminDownload, qrImage, verify };
