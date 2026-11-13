@@ -58,7 +58,7 @@ async function qrImage(req, res, next) {
 // Public check used by the page the QR code opens (ICT fee receipts only)
 async function verify(req, res, next) {
   try {
-    const p = await Payment.findOne({ reference: req.params.reference, status: 'success', type: 'ict_fee' })
+        const p = await Payment.findOne({ reference: req.params.reference, status: 'success', type: { $in: ADMIN_RECEIPT_TYPES } })
       .populate('institution', 'name')
       .populate('level', 'name');
     if (!p) throw new AppError('This receipt could not be verified.', 404, 'NOT_FOUND');
