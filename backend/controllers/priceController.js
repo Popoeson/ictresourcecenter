@@ -3,8 +3,9 @@ const { AppError } = require('../middleware/errorHandler');
 const { normKey } = require('../services/normalize');
 const auditService = require('../services/auditService');
 
-const FIELDS = ['ictFee', 'handoutPrice', 'departmentalFee'];
-const DEPARTMENTAL_DEPARTMENT_KEY = normKey('Computer Science');
+const FIELDS = ['ictFee', 'handoutPrice', 'departmentalFee', 'infrastructureDues'];
+// The departmental fee and the infrastructure dues are only for students in these departments
+const ELIGIBLE_DEPARTMENT_KEYS = [normKey('Computer Science'), normKey('Computer Engineering')];
 
 function send(res, data, status = 200) {
   res.status(status).json({ success: true, data });
@@ -21,10 +22,10 @@ async function listPrices(req, res, next) {
     const prices = await Price.find({ institution: { $in: ids } });
     const priceMap = new Map(prices.map((p) => [`${p.institution}:${p.levelKey}`, p]));
 
-    // The departmental fee only applies where there is a Computer Science department
+    // These fees only apply where there is a Computer Science or Computer Engineering department
     const csDepartments = await Department.find({
       institution: { $in: ids },
-      nameKey: DEPARTMENTAL_DEPARTMENT_KEY,
+      nameKey: { $in: ELIGIBLE_DEPARTMENT_KEYS },
     })
       .select('institution')
       .lean();
@@ -44,6 +45,7 @@ async function listPrices(req, res, next) {
           ictFee: p ? p.ictFee : null,
           handoutPrice: p ? p.handoutPrice : null,
           departmentalFee: p ? p.departmentalFee : null,
+          infrastructureDues: p ? p.infrastructureDues : null,
         });
       }
       return {
