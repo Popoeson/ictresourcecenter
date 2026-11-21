@@ -5,6 +5,7 @@ const logger = require('../config/logger');
 const paystack = require('./paystackProvider');
 const tokenService = require('./tokenService');
 const handoutOrderService = require('./handoutOrderService');
+const duesService = require('./duesService');
 
 // The callback page, the webhook and the Super Admin "re-verify" all use this file,
 // so a payment is fulfilled exactly once whichever path gets there first.
@@ -48,17 +49,48 @@ async function fulfilPayment(reference, via, ps) {
   if (ps.gatewayResponse) set['providerData.gatewayResponse'] = ps.gatewayResponse;
   if (ps.paidAt) set['providerData.paidAt'] = ps.paidAt;
 
-  let won;
-  try {
-    won = await Payment.findOneAndUpdate({ reference, status: 'pending' }, { $set: set }, { new: true });
-  } catch (err) {
-    if (err && err.code === 11000) {
-            const dup = await Payment.findOne({ reference }).select('type').lean();
-      const what = dup && dup.type === 'departmental_fee' ? 'departmental fee' : 'ICT fee';
-      await flag(reference, 'This student already paid the ' + what + '. Refund this payment in Paystack.');
+  // Infrastructure dues: check the payment still fits the balance, and give it its instalment number
+  const pending = await Payment.findOne({ reference, status: 'pending' }).select('type student amount');
+  if (pending && pending.type === 'infrastructure_dues') {
+    const check = await duesService.numberFor(pending);
+    if (!check.ok) {
+      await flag(reference, check.reason);
       return Payment.findOne({ reference });
     }
-    throw err;
+    set.instalmentNumber = check.number;
+  }
+
+  let won = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      won = await Payment.findOneAndUpdate({ reference, status: 'pending' }, { $set: set }, { new: true });
+      break;
+    } catch (err) {
+      if (!(err && err.code === 11000)) throw err;
+
+      const dup = await Payment.findOne({ reference }).select('type student amount status');
+
+      // Another instalment took the same number a moment ago: work the number out again and retry
+      if (dup && dup.type === 'infrastructure_dues' && dup.status === 'pending' && attempt < 2) {
+        const again = await duesService.numberFor(dup);
+        if (!again.ok) {
+          await flag(reference, again.reason);
+          return Payment.findOne({ reference });
+        }
+        set.instalmentNumber = again.number;
+        continue;
+      }
+
+      let reason;
+      if (dup && dup.type === 'infrastructure_dues') {
+        reason = 'Two instalments were confirmed at the same time. Refund this payment in Paystack.';
+      } else {
+        const what = dup && dup.type === 'departmental_fee' ? 'departmental fee' : 'ICT fee';
+        reason = 'This student already paid the ' + what + '. Refund this payment in Paystack.';
+      }
+      await flag(reference, reason);
+      return Payment.findOne({ reference });
+    }
   }
   if (!won) return Payment.findOne({ reference });
 
@@ -83,9 +115,7 @@ async function fulfilPayment(reference, via, ps) {
     } catch (err) {
       logger.error({ reference, err: err.message }, 'Token creation failed after payment');
     }
-  }
-  
-if (won.type === 'handout') {
+  } else if (won.type === 'handout') {
     // If this fails, the payment stays successful and the order is created when the callback page is next opened.
     try {
       await handoutOrderService.createOrder(won);
