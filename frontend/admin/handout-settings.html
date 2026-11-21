@@ -103,16 +103,94 @@
       </table>
     </div>
 
-    <div class="pager hidden" id="pager">
+        <div class="pager hidden" id="pager">
       <button type="button" class="btn btn-secondary btn-small" id="pager-prev">Previous</button>
       <span class="pager-info" id="pager-info"></span>
       <button type="button" class="btn btn-secondary btn-small" id="pager-next">Next</button>
+    </div>
+
+    <!-- Other handouts (not the ICT handout) -->
+    <h2>Other handouts</h2>
+    <p class="muted">Extra handouts for other courses. Each has its own title, department, level and price.</p>
+    <div id="x-alert" aria-live="polite"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="x-add">Add handout</button>
+    </div>
+
+    <section class="card token-panel hidden" id="x-card" role="group" aria-labelledby="x-card-title">
+      <h2 id="x-card-title" tabindex="-1">Add handout</h2>
+      <div id="x-card-alert" aria-live="polite"></div>
+      <p id="x-target" class="hidden"></p>
+      <div class="field">
+        <label for="x-title">Title</label>
+        <input class="input" type="text" id="x-title" maxlength="120" autocomplete="off">
+      </div>
+      <div id="x-scope">
+        <div class="field">
+          <label for="x-inst">Institution</label>
+          <select class="select" id="x-inst"></select>
+        </div>
+        <div class="field">
+          <label for="x-dept">Department</label>
+          <select class="select" id="x-dept" disabled></select>
+        </div>
+        <div class="field">
+          <label for="x-level">Level</label>
+          <select class="select" id="x-level" disabled></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="x-price">Price (\u20A6)</label>
+        <input class="input" type="text" id="x-price" inputmode="decimal" autocomplete="off">
+        <p class="hint">Type the amount in naira, for example 2500.</p>
+      </div>
+      <label class="dropzone" id="x-dropzone" for="x-file">
+        <p class="dropzone-title">Choose a PDF</p>
+        <p class="hint" id="x-file-hint">PDF only, up to 10 MB.</p>
+        <input class="sr-only" type="file" id="x-file" accept=".pdf,application/pdf">
+      </label>
+      <div class="file-chip hidden" id="x-chip">
+        <div>
+          <div class="file-chip-name" id="x-chip-name"></div>
+          <div class="hint" id="x-chip-size"></div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" id="x-chip-remove">Remove</button>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="x-save">Add handout</button>
+        <button type="button" class="btn btn-secondary" id="x-cancel">Cancel</button>
+      </div>
+    </section>
+
+    <p class="hint" id="x-count" aria-live="polite"></p>
+    <div id="x-empty" class="card hidden"></div>
+    <div class="table-wrap hidden" id="x-wrap">
+      <table class="table responsive students-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Institution</th>
+            <th>Department</th>
+            <th>Level</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody id="x-body"></tbody>
+      </table>
+    </div>
+    <div class="pager hidden" id="x-pager">
+      <button type="button" class="btn btn-secondary btn-small" id="x-prev">Previous</button>
+      <span class="pager-info" id="x-info"></span>
+      <button type="button" class="btn btn-secondary btn-small" id="x-next">Next</button>
     </div>
   </div>
 
   <script src="/js/ui.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
-  <script src="/js/pages/handout-settings.js"></script>
+    <script src="/js/pages/handout-settings.js"></script>
+  <script src="/js/pages/extra-handouts.js"></script>
 </body>
 </html>
