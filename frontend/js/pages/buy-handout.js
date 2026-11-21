@@ -6,17 +6,25 @@
   function toOptions(list) {
     return (list || []).map(function (x) { return { id: idOf(x), name: x.name }; });
   }
+  function selText(select) {
+    var o = select.options[select.selectedIndex];
+    return o ? o.text : '';
+  }
 
   var el = {
     name: $('f-name'), phone: $('f-phone'), email: $('f-email'),
     eName: $('e-name'), ePhone: $('e-phone'), eEmail: $('e-email'),
     inst: $('f-inst'), deptField: $('dept-field'), dept: $('f-dept'),
     levelField: $('level-field'), level: $('f-level'),
-    feeCard: $('fee-card'), feeAmount: $('fee-amount'), feeFor: $('fee-for'),
+    handoutField: $('handout-field'), handoutList: $('handout-list'),
+    feeCard: $('fee-card'), feeLabel: $('fee-title'), feeAmount: $('fee-amount'), feeFor: $('fee-for'),
     deliveryField: $('delivery-field'), choicePdf: $('choice-pdf'), choicePickup: $('choice-pickup'),
     note: $('delivery-note'), pay: $('pay-btn'), alert: $('page-alert')
   };
 
+  // choices: the handouts the buyer can pick for this level (the ICT handout and any extra ones)
+  // quote: the choice that is selected
+  var choices = [];
   var quote = null;
   var quoteSeq = 0;
 
@@ -37,14 +45,21 @@
 
   function radios() { return document.querySelectorAll('input[name="delivery"]'); }
 
-  function resetQuote() {
+  function clearSelection() {
     quote = null;
-    quoteSeq += 1;
     hide(el.feeCard);
     hide(el.deliveryField);
     hide(el.note);
     hide(el.pay);
     Array.prototype.forEach.call(radios(), function (r) { r.checked = false; });
+  }
+
+  function resetQuote() {
+    quoteSeq += 1;
+    choices = [];
+    el.handoutList.innerHTML = '';
+    hide(el.handoutField);
+    clearSelection();
   }
 
   function resetLevel() {
@@ -100,10 +115,10 @@
   el.level.addEventListener('change', function () {
     clearAlert();
     resetQuote();
-    if (el.level.value) loadQuote();
+    if (el.level.value) loadChoices();
   });
 
-  /* ---------- Price and delivery ---------- */
+  /* ---------- Handouts, price and delivery ---------- */
 
   function currentDelivery() {
     if (!quote || quote.blocked) return '';
@@ -126,6 +141,7 @@
       return;
     }
 
+    el.feeLabel.textContent = q.title;
     el.feeAmount.textContent = UI.naira(q.amount);
     el.feeFor.textContent = [q.institution, q.department, q.level].join(' \u00B7 ');
     show(el.feeCard);
@@ -152,26 +168,91 @@
     updatePay();
   }
 
-  function loadQuote() {
-    var id = ++quoteSeq;
-    UI.showLoader('Loading...');
-    Api.get('/handouts/quote', {
-      institution: el.inst.value,
-      department: el.dept.value,
-      level: el.level.value
-    }).then(
-      function (q) {
-        if (id !== quoteSeq) return;
-        UI.hideLoader();
-        renderQuote(q);
-      },
-      function (err) {
-        if (id !== quoteSeq) return;
-        UI.hideLoader();
-        showAlert(err.code === 'PRICE_NOT_SET' ? 'warning' : 'error', err.message,
-          err.code === 'PRICE_NOT_SET' ? '' : 'Please try again.');
+  function selectChoice(c) {
+    clearAlert();
+    clearSelection();
+    renderQuote(c);
+  }
+
+  function renderChooser() {
+    el.handoutList.innerHTML = choices.map(function (c, i) {
+      var text = c.blocked ? 'Not available yet.' : UI.naira(c.amount);
+      return '<label class="choice">' +
+        '<input type="radio" name="handout" value="' + i + '"' + (c.blocked ? ' disabled' : '') + '>' +
+        '<span><span class="choice-title">' + UI.esc(c.title) + '</span>' +
+        '<span class="choice-text">' + UI.esc(text) + '</span></span></label>';
+    }).join('');
+    show(el.handoutField);
+  }
+
+  el.handoutList.addEventListener('change', function (e) {
+    var t = e.target;
+    if (!t || t.name !== 'handout') return;
+    var c = choices[Number(t.value)];
+    if (c) selectChoice(c);
+  });
+
+  function buildChoices(ictRes, extraRes) {
+    var list = [];
+    var inst = selText(el.inst);
+    var dept = selText(el.dept);
+    var lvl = selText(el.level);
+
+    if (ictRes.q) {
+      var q = ictRes.q;
+      list.push({
+        kind: 'ict', title: 'ICT course handout', amount: q.amount, options: q.options,
+        blocked: !!q.blocked, message: q.message,
+        institution: q.institution, department: q.department, level: q.level
+      });
+    }
+    if (extraRes.r) {
+      (extraRes.r.items || []).forEach(function (h) {
+        list.push({
+          kind: 'extra', id: h.id, title: h.title, amount: h.price, options: extraRes.r.options,
+          blocked: false, message: null, institution: inst, department: dept, level: lvl
+        });
+      });
+    }
+    choices = list;
+
+    if (!list.length) {
+      var err = ictRes.err || extraRes.err;
+      if (err) {
+        var soft = err.code === 'PRICE_NOT_SET';
+        showAlert(soft ? 'warning' : 'error', err.message, soft ? '' : 'Please try again.');
+      } else {
+        showAlert('warning', 'No handouts are available for this level yet.', 'Please contact your course lecturer.');
       }
+      return;
+    }
+
+    if (list.length === 1) {
+      selectChoice(list[0]);
+      return;
+    }
+    renderChooser();
+  }
+
+  function loadChoices() {
+    var id = ++quoteSeq;
+    var params = { institution: el.inst.value, department: el.dept.value, level: el.level.value };
+    UI.showLoader('Loading...');
+
+    var ict = Api.get('/handouts/quote', params).then(
+      function (q) { return { q: q }; },
+      function (err) { return { err: err }; }
     );
+    var extra = Api.get('/extra-handouts', params).then(
+      function (r) { return { r: r }; },
+      function (err) { return { err: err }; }
+    );
+
+    Promise.all([ict, extra]).then(function (res) {
+      if (id !== quoteSeq) return;
+      UI.hideLoader();
+      buildChoices(res[0], res[1]);
+    });
   }
 
   Array.prototype.forEach.call(radios(), function (r) {
@@ -224,17 +305,33 @@
     var details = validateDetails();
     if (!details) return;
 
+    var path;
+    var body;
+    if (quote.kind === 'extra') {
+      path = '/extra-handouts/initialize';
+      body = {
+        name: details.name,
+        phone: details.phone,
+        email: details.email,
+        handout: quote.id,
+        delivery: delivery
+      };
+    } else {
+      path = '/handouts/initialize';
+      body = {
+        name: details.name,
+        phone: details.phone,
+        email: details.email,
+        institution: el.inst.value,
+        department: el.dept.value,
+        level: el.level.value,
+        delivery: delivery
+      };
+    }
+
     el.pay.disabled = true;
     UI.showLoader('Taking you to Paystack...');
-    Api.post('/handouts/initialize', {
-      name: details.name,
-      phone: details.phone,
-      email: details.email,
-      institution: el.inst.value,
-      department: el.dept.value,
-      level: el.level.value,
-      delivery: delivery
-    }).then(
+    Api.post(path, body).then(
       function (r) { window.location.href = r.authorizationUrl; },
       function (err) {
         UI.hideLoader();
