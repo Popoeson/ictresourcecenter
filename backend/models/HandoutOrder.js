@@ -14,7 +14,10 @@ const handoutOrderSchema = new mongoose.Schema(
     department: { type: ObjectId, ref: 'Department', required: true },
     level: { type: ObjectId, ref: 'Level', required: true },
     delivery: { type: String, enum: ['pdf', 'pickup'], required: true },
-    handoutFile: { type: ObjectId, ref: 'HandoutFile', default: null },
+        handoutFile: { type: ObjectId, ref: 'HandoutFile', default: null },
+    // Set only when the buyer bought an extra (non-ICT) handout
+    extraHandout: { type: ObjectId, ref: 'ExtraHandout', default: null },
+    handoutTitle: { type: String, default: null },
     pickupCode: { type: String, unique: true, sparse: true },
     // Set only for pickup orders
     pickup: {
