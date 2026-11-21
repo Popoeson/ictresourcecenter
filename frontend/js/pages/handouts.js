@@ -102,7 +102,8 @@
       '<td data-label="Date">' + UI.esc(UI.fmtDate(o.createdAt)) + '</td>' +
       '<td data-label="Buyer"><span class="student-name">' + UI.esc(o.buyerName || '\u2014') + '</span>' +
         (contact ? '<div class="hint">' + UI.esc(contact) + '</div>' : '') + '</td>' +
-      '<td data-label="Class">' + UI.esc(klass || '\u2014') + '</td>' +
+            '<td data-label="Class">' + UI.esc(klass || '\u2014') +
+        (o.handoutTitle ? '<div class="hint">' + UI.esc(o.handoutTitle) + '</div>' : '') + '</td>' +
       '<td data-label="Delivery">' + deliveryCell(o) + '</td>' +
       '<td data-label="Buyer type">' + buyerTypeCell(o) + '</td>' +
       '<td data-label="Pickup">' + pickupCell(o) + '</td>' +
