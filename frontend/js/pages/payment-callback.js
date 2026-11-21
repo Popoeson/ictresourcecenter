@@ -197,7 +197,10 @@
 
   function renderHandout(p, h) {
     setTitle('Payment received');
-    var rows = h ? detailRow('Delivery', h.delivery === 'pdf' ? 'PDF download' : 'Pickup') : '';
+        var rows = h
+      ? (h.title ? detailRow('Handout', h.title) : '') +
+        detailRow('Delivery', h.delivery === 'pdf' ? 'PDF download' : 'Pickup')
+      : '';
     var details = detailsHtml(p, rows);
 
     if (!h) {
