@@ -21,13 +21,17 @@ const saveSchema = z
     levelKey: z.string().trim().min(1).max(120),
     ictFee: kobo,
     handoutPrice: kobo,
-    departmentalFee: kobo,
+        departmentalFee: kobo,
+    infrastructureDues: kobo,
   })
   .refine(
-    (d) => d.ictFee !== undefined || d.handoutPrice !== undefined || d.departmentalFee !== undefined,
+    (d) =>
+      d.ictFee !== undefined ||
+      d.handoutPrice !== undefined ||
+      d.departmentalFee !== undefined ||
+      d.infrastructureDues !== undefined,
     'Nothing to update.'
   );
-
 router.use(protect);
 
 // Admins and Super Admins may read. Only the Super Admin may write.
