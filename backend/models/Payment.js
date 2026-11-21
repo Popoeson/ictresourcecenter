@@ -25,7 +25,8 @@ const paymentSchema = new mongoose.Schema(
     details: {
       fileCount: { type: Number },
       pricePerFile: { type: Number },
-      delivery: { type: String, enum: ['pdf', 'pickup'] },
+            delivery: { type: String, enum: ['pdf', 'pickup'] },
+      extraHandout: { type: ObjectId, ref: 'ExtraHandout' },
     },
     // Empty in v1. Future shape: { mode, code, share, bearer }
     split: { type: mongoose.Schema.Types.Mixed, default: null },
