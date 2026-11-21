@@ -18,10 +18,11 @@ const verifyLimiter = makeLimiter({
 });
 
 const initSchema = z.object({
-  type: z.enum(['ict_fee', 'assignment', 'handout', 'departmental_fee']),
+    type: z.enum(['ict_fee', 'assignment', 'handout', 'departmental_fee', 'infrastructure_dues']),
   studentId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid student.'),
-  files: z.number().int().min(1).max(100).optional(),
-});
+    files: z.number().int().min(1).max(100).optional(),
+  // Infrastructure dues only: the amount the student chooses, in kobo. The server checks it against the balance.
+  amount: z.number().int().min(1).max(1000000000).optional(),
 const refParams = z.object({
   reference: z.string().regex(/^[A-Za-z0-9_-]{6,64}$/, 'Invalid reference.'),
 });
