@@ -4,6 +4,7 @@ const { AppError } = require('../middleware/errorHandler');
 const { env } = require('../config/env');
 const { normKey } = require('./normalize');
 const paystack = require('./paystackProvider');
+const duesService = require('./duesService');
 
 // Paystack needs an email. Students who only gave a phone number get a placeholder.
 const NO_EMAIL_DOMAIN = 'noemail.example.com';
@@ -13,7 +14,7 @@ const DEFAULT_MAX_FILES = 10;
 // The departmental fee is only for students in a department with this name, in any institution
 const DEPARTMENTAL_DEPARTMENT_KEYS = [normKey('Computer Science'), normKey('Computer Engineering')];
 
-const PAYABLE_TYPES = ['ict_fee', 'assignment', 'departmental_fee'];
+const PAYABLE_TYPES = ['ict_fee', 'assignment', 'departmental_fee', 'infrastructure_dues'];
 
 function generateReference() {
   let s = '';
@@ -59,10 +60,10 @@ async function quoteIctFee(studentId) {
 
 /* ---------- Departmental fee ---------- */
 
-// Only Computer Science students pay it
+// Only Computer Science and Computer Engineering students pay it
 async function ensureDepartmentalEligible(student) {
   const dept = await Department.findById(student.department).select('nameKey');
-    if (!dept || !DEPARTMENTAL_DEPARTMENT_KEYS.includes(dept.nameKey)) {
+  if (!dept || !DEPARTMENTAL_DEPARTMENT_KEYS.includes(dept.nameKey)) {
     throw new AppError('The departmental fee is only for Computer Science and Computer Engineering students.', 403, 'NOT_ELIGIBLE');
   }
 }
@@ -92,6 +93,14 @@ async function quoteDepartmentalFee(studentId) {
   );
   if (paid) return { alreadyPaid: true, reference: paid.reference };
   return { alreadyPaid: false, amount: await departmentalFeeAmountFor(student), currency: 'NGN' };
+}
+
+/* ---------- Infrastructure dues ---------- */
+
+// Total, paid so far, balance, and the amounts the student may pay now
+async function quoteInfrastructureDues(studentId) {
+  const student = await loadStudent(studentId);
+  return duesService.quote(student);
 }
 
 /* ---------- Assignment ---------- */
@@ -131,12 +140,14 @@ async function quoteAssignment(studentId, files) {
 async function quote({ type, studentId, files }) {
   if (type === 'ict_fee') return quoteIctFee(studentId);
   if (type === 'departmental_fee') return quoteDepartmentalFee(studentId);
+  if (type === 'infrastructure_dues') return quoteInfrastructureDues(studentId);
   if (type === 'assignment') return quoteAssignment(studentId, files);
   throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
 }
 
-// Creates the pending payment and returns the Paystack link. The amount is always calculated here.
-async function initializePayment({ type, studentId, files }) {
+// Creates the pending payment and returns the Paystack link. The amount is always calculated or checked here.
+// For infrastructure dues the student chooses the amount, and it is checked against the balance and the minimum.
+async function initializePayment({ type, studentId, files, amount: requestedAmount }) {
   if (!PAYABLE_TYPES.includes(type)) {
     throw new AppError('This payment type is not available yet.', 400, 'NOT_AVAILABLE');
   }
@@ -148,6 +159,10 @@ async function initializePayment({ type, studentId, files }) {
     amount = await feeAmountFor(student);
   } else if (type === 'departmental_fee') {
     amount = await departmentalFeeAmountFor(student);
+  } else if (type === 'infrastructure_dues') {
+    const r = await duesService.amountFor(student, requestedAmount);
+    amount = r.amount;
+    details = { duesTotal: r.quote.total, paidBefore: r.quote.paid };
   } else {
     const { count } = await checkFileCount(files);
     const pricePerFile = await assignmentPriceFor(student);
@@ -197,6 +212,7 @@ module.exports = {
   quote,
   quoteIctFee,
   quoteDepartmentalFee,
+  quoteInfrastructureDues,
   quoteAssignment,
   generateReference,
   callbackUrlFor,
