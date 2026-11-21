@@ -17,7 +17,11 @@ const settingSchema = new mongoose.Schema(
       enabled: { type: Boolean, default: false },
       rules: { type: [mongoose.Schema.Types.Mixed], default: [] },
     },
-    lecturerContactText: { type: String, default: 'Please contact your course lecturer.' },
+        lecturerContactText: { type: String, default: 'Please contact your course lecturer.' },
+    // Infrastructure dues: most instalments a student may use, and the smallest instalment (kobo, 0 = no minimum)
+    duesMaxInstalments: { type: Number, default: 1, min: 1 },
+    duesMinInstalment: { type: Number, default: 0, min: 0 },
+    
   },
   { timestamps: true }
 );
