@@ -20,6 +20,7 @@ const priceSchema = new mongoose.Schema(
     ictFee: koboField,
     handoutPrice: koboField,
     departmentalFee: koboField,
+    infrastructureDues: koboField,
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', default: null },
   },
   { timestamps: true }
