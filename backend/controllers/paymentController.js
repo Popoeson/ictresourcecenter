@@ -24,6 +24,7 @@ async function initialize(req, res, next) {
       type: req.body.type,
       studentId: req.body.studentId,
       files: req.body.files,
+      amount: req.body.amount,
     }), 201);
   } catch (err) {
     next(err);
