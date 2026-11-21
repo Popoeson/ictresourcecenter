@@ -5,7 +5,11 @@ const { ObjectId } = mongoose.Schema.Types;
 const paymentSchema = new mongoose.Schema(
   {
     reference: { type: String, required: true, unique: true },
-        type: { type: String, enum: ['ict_fee', 'assignment', 'handout', 'departmental_fee'], required: true },
+    type: {
+      type: String,
+      enum: ['ict_fee', 'assignment', 'handout', 'departmental_fee', 'infrastructure_dues'],
+      required: true,
+    },
     status: {
       type: String,
       enum: ['pending', 'success', 'failed', 'abandoned', 'flagged'],
@@ -25,9 +29,14 @@ const paymentSchema = new mongoose.Schema(
     details: {
       fileCount: { type: Number },
       pricePerFile: { type: Number },
-            delivery: { type: String, enum: ['pdf', 'pickup'] },
+      delivery: { type: String, enum: ['pdf', 'pickup'] },
       extraHandout: { type: ObjectId, ref: 'ExtraHandout' },
+      // Infrastructure dues: the total and what was already paid when this payment started (kobo)
+      duesTotal: { type: Number },
+      paidBefore: { type: Number },
     },
+    // Infrastructure dues only: 1 for the first successful instalment, 2 for the second, and so on
+    instalmentNumber: { type: Number },
     // Empty in v1. Future shape: { mode, code, share, bearer }
     split: { type: mongoose.Schema.Types.Mixed, default: null },
     provider: { type: String, default: 'paystack' },
@@ -48,16 +57,19 @@ const paymentSchema = new mongoose.Schema(
 );
 
 // One successful ICT fee per student, even under simultaneous requests
-
 paymentSchema.index(
   { student: 1, type: 1 },
   { unique: true, partialFilterExpression: { type: 'ict_fee', status: 'success' } }
 );
-paymentSchema.index({ type: 1, status: 1, createdAt: -1 });
 // One successful departmental fee per student. The key order differs from the ICT fee index on purpose.
 paymentSchema.index(
   { type: 1, student: 1 },
   { unique: true, partialFilterExpression: { type: 'departmental_fee', status: 'success' } }
+);
+// Infrastructure dues: each instalment number is used once per student, even under simultaneous requests
+paymentSchema.index(
+  { type: 1, student: 1, instalmentNumber: 1 },
+  { unique: true, partialFilterExpression: { type: 'infrastructure_dues', status: 'success' } }
 );
 paymentSchema.index({ type: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ student: 1 });
