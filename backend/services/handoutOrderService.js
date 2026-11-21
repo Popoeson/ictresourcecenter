@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { Payment, Student, HandoutFile, HandoutOrder } = require('../models');
+const ExtraHandout = require('../models/ExtraHandout');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../config/logger');
 const fileService = require('./fileService');
@@ -40,8 +41,11 @@ function activeFileFor(scope) {
   });
 }
 
-// The newest PDF for the buyer's level. If it was replaced, the buyer gets the replacement.
+// The PDF record for an order. Both kinds have a `file` with the stored PDF details.
+// ICT handout: the newest PDF for the buyer's level (a replacement reaches the buyer).
+// Extra handout: that handout's own PDF, even if it was turned off after the purchase.
 async function resolveFile(order) {
+  if (order.extraHandout) return ExtraHandout.findById(order.extraHandout);
   const current = await activeFileFor(order);
   if (current) return current;
   return order.handoutFile ? HandoutFile.findById(order.handoutFile) : null;
@@ -61,8 +65,16 @@ async function createOrder(payment) {
   const buyer = { name: payer.name || '', phone: payer.phone || '', email: payer.email || '' };
   const match = await matchStudent(buyer);
 
+  // Extra handout: remember which one was bought, with its title as it was at purchase
+  const extraId = payment.details && payment.details.extraHandout;
+  let extra = null;
+  if (extraId) {
+    extra = await ExtraHandout.findById(extraId).select('title');
+    if (!extra) logger.warn({ reference: payment.reference }, 'Paid extra handout record not found');
+  }
+
   let file = null;
-  if (delivery === 'pdf') {
+  if (delivery === 'pdf' && !extraId) {
     file = await activeFileFor(payment);
     if (!file) logger.warn({ reference: payment.reference }, 'Paid PDF handout has no PDF uploaded');
   }
@@ -76,6 +88,8 @@ async function createOrder(payment) {
       level: payment.level,
       delivery,
       handoutFile: file ? file._id : null,
+      extraHandout: extra ? extra._id : null,
+      handoutTitle: extra ? extra.title : null,
       isStudent: !!match,
       matchedStudent: match ? match.student : null,
       matchedBy: match ? match.by : null,
@@ -113,6 +127,7 @@ async function handoutInfo(reference) {
     pickupCode: order.pickupCode || null,
     pickupStatus: (order.pickup && order.pickup.status) || null,
     pdfAvailable,
+    title: order.handoutTitle || null,
   };
 }
 
