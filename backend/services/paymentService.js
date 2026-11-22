@@ -195,6 +195,7 @@ async function initializePayment({ type, studentId, files, amount: requestedAmou
       callbackUrl: callbackUrlFor(reference),
       metadata: { type, studentId: String(student._id), fileCount: details ? details.fileCount : undefined },
       split: null,
+      splitGroup: type === 'infrastructure_dues' ? 'dues' : 'standard',
     });
     payment.providerData = { accessCode: init.accessCode, authorizationUrl: init.authorizationUrl };
     await payment.save();
