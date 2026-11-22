@@ -18,10 +18,22 @@ function client() {
   });
 }
 
-// Builds the Paystack request. If a split code is set, Paystack applies the split and shows it in its own
-// dashboard. The amount charged and recorded on this site stays the full amount.
+// Which split code a payment group uses.
+//   standard: ICT fee, departmental fee, assignment, extra handouts  -> PAYSTACK_SPLIT_CODE
+//   handout:  the ICT handout                                          -> PAYSTACK_SPLIT_CODE_HANDOUT
+//   dues:     infrastructure dues                                      -> PAYSTACK_SPLIT_CODE_DUES
+// If the code for handout or dues is empty, the standard code is used, so nothing changes until it is set.
+function splitCodeFor(group) {
+  const standard = String(env.paystackSplitCode || '').trim();
+  let specific = '';
+  if (group === 'dues') specific = String(env.paystackSplitCodeDues || '').trim();
+  else if (group === 'handout') specific = String(env.paystackSplitCodeHandout || '').trim();
+  return specific || standard;
+}
 
-function buildInitializeBody({ email, amountKobo, reference, callbackUrl, metadata, split }) {
+// Builds the Paystack request. If a split code applies, Paystack applies the split and shows it in its own
+// dashboard. The amount charged and recorded on this site stays the full amount.
+function buildInitializeBody({ email, amountKobo, reference, callbackUrl, metadata, split, splitGroup }) {
   const body = {
     email,
     amount: amountKobo,
@@ -30,14 +42,20 @@ function buildInitializeBody({ email, amountKobo, reference, callbackUrl, metada
     callback_url: callbackUrl,
     metadata: metadata || {},
   };
-    const splitCode = (split && split.code) || (env.paystackSplitCode || '').trim();
+  const splitCode = (split && split.code) || splitCodeFor(splitGroup);
   if (splitCode) body.split_code = splitCode;
   return body;
 }
 
 async function initialize(params) {
   try {
-    const res = await client().post('/transaction/initialize', buildInitializeBody(params));
+    const body = buildInitializeBody(params);
+    // The code itself is never logged, only which group was used and whether a split was applied
+    logger.info(
+      { reference: params.reference, splitGroup: params.splitGroup || 'standard', split: !!body.split_code },
+      'Paystack initialize'
+    );
+    const res = await client().post('/transaction/initialize', body);
     const d = res.data && res.data.data;
     if (!res.data || !res.data.status || !d || !d.authorization_url) {
       throw new Error('Unexpected response from Paystack');
