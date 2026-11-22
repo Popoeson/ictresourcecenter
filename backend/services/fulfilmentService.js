@@ -215,7 +215,7 @@ async function verifyAndFulfil(reference, via) {
       result.handout = await handoutOrderService.handoutInfo(reference);
     } catch (err) {
       logger.error({ reference, err: err.message }, 'Could not load the handout order');
-            result.handout = null;
+      result.handout = null;
     }
   } else if (result.outcome === 'success' && result.payment.type === 'infrastructure_dues') {
     // Dues have no receipt. The callback page shows the balance that is left.
@@ -230,5 +230,6 @@ async function verifyAndFulfil(reference, via) {
     }
   }
   return result;
+}
 
 module.exports = { verifyAndFulfil, fulfilPayment, ensureReceiptNumber, summary, flag, tokenInfo };
