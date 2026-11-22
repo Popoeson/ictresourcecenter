@@ -19,7 +19,8 @@
 
     <div class="tabs" role="tablist" aria-label="Price type">
       <button type="button" class="tab" role="tab" id="tab-ict" aria-selected="true" aria-controls="panel-ict">ICT fee and handout</button>
-      <button type="button" class="tab" role="tab" id="tab-assignment" aria-selected="false" aria-controls="panel-assignment">Assignment (per file)</button>
+            <button type="button" class="tab" role="tab" id="tab-assignment" aria-selected="false" aria-controls="panel-assignment">Assignment (per file)</button>
+      <button type="button" class="tab" role="tab" id="tab-dues" aria-selected="false" aria-controls="panel-dues">Infrastructure dues</button>
     </div>
 
     <div id="page-alert" aria-live="polite"></div>
@@ -83,10 +84,36 @@
         <button type="button" class="btn btn-secondary btn-small" id="as-clear">Clear filters</button>
       </div>
       <p class="hint" id="as-count" aria-live="polite"></p>
-      <div id="assignment-list"></div>
+            <div id="assignment-list"></div>
+    </div>
+
+    <div id="panel-dues" role="tabpanel" aria-labelledby="tab-dues" class="hidden">
+      <p class="hint">Infrastructure dues are only for Computer Science and Computer Engineering students. Students can pay in instalments until the total is cleared.</p>
+      <div id="dues-alert" aria-live="polite"></div>
+
+      <section class="card">
+        <h2>Instalments</h2>
+        <p class="muted">These two settings apply to every institution.</p>
+        <div class="field">
+          <label for="dues-max">Most payments a student may use</label>
+          <input class="input" id="dues-max" type="text" inputmode="numeric" autocomplete="off">
+          <p class="hint">A whole number from 1 to 10. On the last allowed payment the student must pay the whole remaining balance.</p>
+        </div>
+        <div class="field">
+          <label for="dues-min">Smallest payment (&#8358;)</label>
+          <input class="input" id="dues-min" type="text" inputmode="decimal" autocomplete="off" placeholder="No minimum">
+          <p class="hint">Leave empty for no minimum.</p>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="dues-settings-save">Save settings</button>
+        </div>
+      </section>
+
+      <h2>Total dues</h2>
+      <p class="hint">The full amount a student pays for each level. Each row saves on its own.</p>
+      <div id="dues-list"></div>
     </div>
   </div>
-
   <script src="/js/ui.js"></script>
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
