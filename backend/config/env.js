@@ -3,14 +3,17 @@ const env = {
   port: process.env.PORT || 3000,
   mongodbUri: process.env.MONGODB_URI,
   frontendUrl: process.env.FRONTEND_URL,
-    trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 2),
+  trustProxyHops: Number(process.env.TRUST_PROXY_HOPS || 2),
   superAdminEmail: process.env.SUPER_ADMIN_EMAIL,
-    superAdminPassword: process.env.SUPER_ADMIN_PASSWORD,
+  superAdminPassword: process.env.SUPER_ADMIN_PASSWORD,
   jwtSecret: process.env.JWT_SECRET,
-    jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
-    paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
+  paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
+  // Split codes: the standard one, plus one for infrastructure dues and one for the ICT handout
   paystackSplitCode: process.env.PAYSTACK_SPLIT_CODE,
+  paystackSplitCodeDues: process.env.PAYSTACK_SPLIT_CODE_DUES,
+  paystackSplitCodeHandout: process.env.PAYSTACK_SPLIT_CODE_HANDOUT,
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
   cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
@@ -20,7 +23,7 @@ const env = {
 function assertEnv() {
   const missing = [];
   if (!env.mongodbUri) missing.push('MONGODB_URI');
-    if (!env.frontendUrl) missing.push('FRONTEND_URL');
+  if (!env.frontendUrl) missing.push('FRONTEND_URL');
   if (!env.jwtSecret) missing.push('JWT_SECRET');
   else if (env.jwtSecret.length < 32) missing.push('JWT_SECRET (must be at least 32 characters)');
   if (missing.length) {
