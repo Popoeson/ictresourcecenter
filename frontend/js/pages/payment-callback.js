@@ -3,7 +3,7 @@
 
   var AUTO_RETRIES = 5;
   var RETRY_MS = 4000;
-  var TYPE_LABEL = { ict_fee: 'ICT course fee', departmental_fee: 'Departmental fee', assignment: 'Assignment submission', handout: 'Course handout' };
+    var TYPE_LABEL = { ict_fee: 'ICT course fee', departmental_fee: 'Departmental fee', infrastructure_dues: 'Infrastructure dues', assignment: 'Assignment submission', handout: 'Course handout' };
 
   function $(id) { return document.getElementById(id); }
 
@@ -37,7 +37,8 @@
   function retryHref(p) {
     if (p && p.type === 'assignment') return '/submit-assignment.html';
     if (p && p.type === 'handout') return '/buy-handout.html';
-    if (p && p.type === 'departmental_fee') return '/pay-departmental-fee.html';
+        if (p && p.type === 'departmental_fee') return '/pay-departmental-fee.html';
+    if (p && p.type === 'infrastructure_dues') return '/pay-infrastructure-dues.html';
     if (!p || p.type === 'ict_fee') return '/pay-fee.html';
     return '/';
   }
@@ -79,10 +80,11 @@
 
   /* ---------- States ---------- */
 
-  function renderSuccess(p, token, handout) {
+    function renderSuccess(p, token, handout, dues) {
     lastPayment = p;
     if (p.type === 'assignment') return renderAssignment(p, token);
     if (p.type === 'handout') return renderHandout(p, handout);
+    if (p.type === 'infrastructure_dues') return renderDues(p, dues);
 
     setTitle('Payment received');
     if (p.type === 'ict_fee') {
@@ -257,6 +259,27 @@
     }
   }
 
+    // Infrastructure dues: no receipt. Shows what was paid and what is left.
+  function renderDues(p, d) {
+    setTitle('Payment received');
+    var rows = '';
+    if (d) {
+      if (d.thisPayment) rows += detailRow('Payment number', String(d.thisPayment));
+      rows += detailRow('Total dues', UI.naira(d.total)) +
+        detailRow('Paid so far', UI.naira(d.paid)) +
+        detailRow('Balance', UI.naira(d.balance));
+    }
+    var fully = !!(d && d.fullyPaid);
+    var intro = fully
+      ? UI.alertHtml('success', 'Your infrastructure dues are fully paid.', 'Thank you. You do not need to pay again.')
+      : UI.alertHtml('success', 'Your payment was received.',
+          d ? 'You still owe ' + UI.naira(d.balance) + '. You can pay the balance from the dues page.' : 'Thank you.');
+    var again = d && !fully
+      ? '<a class="btn btn-primary btn-block" href="/pay-infrastructure-dues.html">Pay the balance</a>'
+      : '';
+    stateEl.innerHTML = intro + detailsHtml(p, rows) + again + finishHtml(p, !again);
+  }
+
   function renderNotCompleted(p) {
     setTitle('Payment not completed');
     stateEl.innerHTML =
@@ -295,7 +318,7 @@
 
   function handle(result) {
     var p = result.payment;
-    if (result.outcome === 'success') return renderSuccess(p, result.token, result.handout);
+        if (result.outcome === 'success') return renderSuccess(p, result.token, result.handout, result.dues);
     stopCountdown();
     if (result.outcome === 'not_completed') return renderNotCompleted(p);
     if (result.outcome === 'flagged') return renderFlagged(p);
