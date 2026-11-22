@@ -2,8 +2,8 @@
   'use strict';
 
   var PAGE_SIZE = 25;
-  var TYPE_LABEL = { ict_fee: 'ICT fee', departmental_fee: 'Departmental fee', assignment: 'Assignment', handout: 'Handout' };
-
+  var TYPE_LABEL = { ict_fee: 'ICT fee', departmental_fee: 'Departmental fee', infrastructure_dues: 'Infrastructure dues', assignment: 'Assignment', handout: 'Handout' };
+  
   var STATUS = {
     success: ['Paid', 'green'],
     pending: ['Pending', 'amber'],
@@ -77,7 +77,8 @@
   function forText(p) {
     var text = TYPE_LABEL[p.type] || p.type;
     if (p.type === 'assignment' && p.fileCount) text += ' \u00B7 ' + p.fileCount + (p.fileCount === 1 ? ' file' : ' files');
-    if (p.type === 'handout' && p.delivery) text += ' \u00B7 ' + (p.delivery === 'pdf' ? 'PDF' : 'Pickup');
+        if (p.type === 'handout' && p.delivery) text += ' \u00B7 ' + (p.delivery === 'pdf' ? 'PDF' : 'Pickup');
+    if (p.type === 'infrastructure_dues' && p.instalmentNumber) text += ' \u00B7 payment ' + p.instalmentNumber;
     return text;
   }
 
