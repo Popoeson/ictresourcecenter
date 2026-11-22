@@ -215,10 +215,20 @@ async function verifyAndFulfil(reference, via) {
       result.handout = await handoutOrderService.handoutInfo(reference);
     } catch (err) {
       logger.error({ reference, err: err.message }, 'Could not load the handout order');
-      result.handout = null;
+            result.handout = null;
+    }
+  } else if (result.outcome === 'success' && result.payment.type === 'infrastructure_dues') {
+    // Dues have no receipt. The callback page shows the balance that is left.
+    try {
+      const paid = await Payment.findOne({ reference }).select('student instalmentNumber');
+      const student = paid && paid.student ? await Student.findById(paid.student) : null;
+      const q = student ? await duesService.quote(student) : null;
+      result.dues = q ? { ...q, thisPayment: paid.instalmentNumber || null } : null;
+    } catch (err) {
+      logger.error({ reference, err: err.message }, 'Could not load the dues balance');
+      result.dues = null;
     }
   }
   return result;
-}
 
 module.exports = { verifyAndFulfil, fulfilPayment, ensureReceiptNumber, summary, flag, tokenInfo };
