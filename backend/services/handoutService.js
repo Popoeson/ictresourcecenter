@@ -118,7 +118,8 @@ async function initializeHandout({ name, phone, email, institution, department, 
       reference,
       callbackUrl: callbackUrlFor(reference),
       metadata: { type: 'handout', delivery },
-      split: null,
+            split: null,
+      splitGroup: 'handout',
     });
     payment.providerData = { accessCode: init.accessCode, authorizationUrl: init.authorizationUrl };
     await payment.save();
