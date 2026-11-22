@@ -10,7 +10,7 @@ const POPULATE = [
   { path: 'level', select: 'name' },
 ];
 const FIELDS =
-  'reference type status amount currency payer institution department level details confirmedAt confirmedVia receiptNumber flagReason createdAt providerData.paidAt providerData.channel';
+  'reference type status amount currency payer institution department level details instalmentNumber confirmedAt confirmedVia receiptNumber flagReason createdAt providerData.paidAt providerData.channel';
 
 function send(res, data, status = 200) {
   res.status(status).json({ success: true, data });
@@ -66,6 +66,7 @@ function toRow(p, isSuper) {
     level: p.level ? p.level.name : '',
     fileCount: d.fileCount || null,
     delivery: d.delivery || null,
+    instalmentNumber: p.instalmentNumber || null,
     receiptNumber: p.receiptNumber || null,
     channel: (p.providerData && p.providerData.channel) || null,
     paidAt: (p.providerData && p.providerData.paidAt) || p.confirmedAt || null,
