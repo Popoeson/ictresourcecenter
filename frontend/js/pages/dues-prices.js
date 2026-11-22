@@ -80,6 +80,7 @@
       return;
     }
 
+    var open = eligible.length <= 3;
     el.list.innerHTML = eligible.map(function (block) {
       var inst = block.institution;
       var rows = block.levels.map(function (l) {
@@ -90,9 +91,19 @@
           '<button type="button" class="btn btn-secondary btn-small" data-act="save">Save</button>' +
           '</div>';
       }).join('');
-      return '<section class="card"><h3 class="price-dept">' + UI.esc(inst.name) + '</h3>' +
+
+      var bodyId = 'body-dues-' + inst.id;
+      var summary = block.levels.length + ' level' + (block.levels.length === 1 ? '' : 's');
+      return '<section class="card price-card' + (open ? '' : ' collapsed') + '">' +
+        '<h2 class="price-card-heading"><button type="button" class="price-card-head" aria-expanded="' + open +
+        '" aria-controls="' + bodyId + '">' +
+        '<span class="price-card-chevron">' + UI.icon('chevron', 20) + '</span>' +
+        '<span class="price-card-title">' + UI.esc(inst.name) + (inst.isActive ? '' : ' ' + UI.badge('Inactive', 'grey')) + '</span>' +
+        '<span class="price-card-summary">' + UI.esc(summary) + '</span>' +
+        '</button></h2>' +
+        '<div class="price-body" id="' + bodyId + '">' +
         (rows || '<p class="empty-state">No levels yet. <a href="/admin/structure.html">Add levels in Structure</a>.</p>') +
-        '</section>';
+        '</div></section>';
     }).join('');
   }
 
@@ -135,6 +146,14 @@
   }
 
   el.list.addEventListener('click', function (e) {
+    var head = e.target.closest('.price-card-head');
+    if (head) {
+      var card = head.closest('.price-card');
+      var collapsed = !card.classList.contains('collapsed');
+      card.classList.toggle('collapsed', collapsed);
+      head.setAttribute('aria-expanded', String(!collapsed));
+      return;
+    }
     var btn = e.target.closest('button[data-act="save"]');
     if (btn) saveRow(btn.closest('.price-row'), btn);
   });
