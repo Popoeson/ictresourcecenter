@@ -350,17 +350,22 @@
 
   /* ---------- Tabs ---------- */
 
-  function selectTab(which) {
+    function selectTab(which) {
     var ict = which === 'ict';
+    var assignment = which === 'assignment';
+    var dues = which === 'dues';
     $('tab-ict').setAttribute('aria-selected', String(ict));
-    $('tab-assignment').setAttribute('aria-selected', String(!ict));
+    $('tab-assignment').setAttribute('aria-selected', String(assignment));
+    $('tab-dues').setAttribute('aria-selected', String(dues));
     $('panel-ict').classList.toggle('hidden', !ict);
-    $('panel-assignment').classList.toggle('hidden', ict);
+    $('panel-assignment').classList.toggle('hidden', !assignment);
+    $('panel-dues').classList.toggle('hidden', !dues);
     clearAlert();
   }
 
   $('tab-ict').addEventListener('click', function () { selectTab('ict'); });
   $('tab-assignment').addEventListener('click', function () { selectTab('assignment'); });
+  $('tab-dues').addEventListener('click', function () { selectTab('dues'); });
 
   Auth.init({ page: 'prices', roles: ['superadmin'] }).then(load);
 })();
