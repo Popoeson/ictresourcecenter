@@ -295,15 +295,22 @@
 
     var priceId = row.getAttribute('data-price-id');
     var noDepartmental = values.departmentalFee === undefined || values.departmentalFee === null;
-    if (values.ictFee === null && values.handoutPrice === null && noDepartmental) {
+        if (values.ictFee === null && values.handoutPrice === null && noDepartmental) {
       if (!priceId) { UI.setFieldError(inputs[0], 'Enter at least one amount.'); return; }
-      runSave(btn, inputs[0], Api.del('/admin/prices/' + priceId), function () {
-        row.setAttribute('data-price-id', '');
+      // The row is cleared, not deleted, so the infrastructure dues kept on it are not lost
+      var cleared = {
+        institution: row.getAttribute('data-institution'),
+        levelKey: row.getAttribute('data-level-key'),
+        ictFee: null,
+        handoutPrice: null
+      };
+      if (values.departmentalFee === null) cleared.departmentalFee = null;
+      runSave(btn, inputs[0], Api.put('/admin/prices', cleared), function (doc) {
+        row.setAttribute('data-price-id', doc._id);
         UI.toast('Prices cleared', 'success');
       });
       return;
     }
-
     runSave(btn, inputs[0],
       Api.put('/admin/prices', {
         institution: row.getAttribute('data-institution'),
