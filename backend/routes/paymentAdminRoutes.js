@@ -14,7 +14,7 @@ const listSchema = z.object({
   page: z.string().regex(/^\d+$/).optional(),
   limit: z.string().regex(/^\d+$/).optional(),
   q: z.string().max(100).optional(),
-  type: z.enum(['ict_fee', 'departmental_fee', 'assignment', 'handout']).optional(),
+    type: z.enum(['ict_fee', 'departmental_fee', 'infrastructure_dues', 'assignment', 'handout']).optional(),
   status: z.enum(['pending', 'success', 'failed', 'abandoned', 'flagged']).optional(),
   institution: objectId.optional(),
   department: objectId.optional(),
